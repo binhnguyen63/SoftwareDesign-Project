@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/admin.css') }}"
+    />
+    <title>Administrator</title>
+    <script>
+      function addRow() {
+        let table = document.getElementById("userTable");
+        let confirmCreateBtn = document.getElementById("confirm-create-btn")
+        let createBtn = document.getElementById("create-btn")
+        createBtn.style.display = "none"
+        confirmCreateBtn.style.display = "inline"
+        let row = table.insertRow(-1);
+        for (let i = 0; i < 2; i++) {
+          let cell = row.insertCell(i);
+          cell.contentEditable = "true";
+        }
+        let roleCell = row.insertCell(2)
+        roleCell.innerHTML = `
+        <select>
+            <option value="admin">Admin</option>
+            <option value="basicUser" selected>basicUser</option>
+            <option value="vipUser">vipUser</option>
+          </select>
+          `
+        let statusCell = row.insertCell(3)
+        statusCell.innerHTML = `
+        <select>
+            <option value="True" selected>True</option>
+            <option value="False">False</option>
+        </select>
+        `
+        let deleteCell = row.insertCell(4);
+        deleteCell.innerHTML =
+          '<button onclick="deleteRow(this)">Delete</button>';
+
+      }
+
+      function confirmAddRow() {
+        let table = document.getElementById("userTable");
+        let confirmCreateBtn = document.getElementById("confirm-create-btn")
+        let createBtn = document.getElementById("create-btn")
+        createBtn.style.display = "inline"
+        confirmCreateBtn.style.display = "none"
+        for (let i = 1; i < table.rows.length; i++) {
+          for (let j = 0; j < 4; j++) {
+            table.rows[i].cells[j].contentEditable = "false";
+            const dropDownEle = table.rows[i].cells[j].querySelector("select")
+            console.log(dropDownEle)
+            if (dropDownEle) dropDownEle.disabled = true
+          }
+        }
+      }
+
+      function deleteRow(button) {
+        let row = button.parentNode.parentNode;
+        row.parentNode.removeChild(row);
+      }
+
+      function enableEditing() {
+        document.getElementById("update").style.display = "none";
+        document.getElementById("confirm-update").style.display = "inline";
+        let table = document.getElementById("userTable");
+        for (let i = 1; i < table.rows.length; i++) {
+          if (table.rows[i].cells[2].querySelector("select").value.toLowerCase() === "admin") continue;
+          for (let j = 0; j < 4; j++) {
+            table.rows[i].cells[j].contentEditable = "true";
+            console.log(table.rows[i].cells[j])
+            const dropDownEle = table.rows[i].cells[j].querySelector("select")
+            console.log(dropDownEle)
+            if (dropDownEle) dropDownEle.disabled = false
+          }
+        }
+      }
+      function disableUpdating() {
+        document.getElementById("update").style.display = "inline";
+        document.getElementById("confirm-update").style.display = "none";
+        let table = document.getElementById("userTable");
+        for (let i = 1; i < table.rows.length; i++) {
+          for (let j = 0; j < 4; j++) {
+            table.rows[i].cells[j].contentEditable = "false";
+            const dropDownEle = table.rows[i].cells[j].querySelector("select")
+            if (dropDownEle) dropDownEle.disabled = true
+          }
+        }
+      }
+    </script>
+  </head>
+  <body>
+    <button id="create-btn" onclick="addRow()">Create</button>
+    <button id="confirm-create-btn" onclick="confirmAddRow()">Confirm Create</button>
+    <button id="update" onclick="enableEditing()">Update</button>
+    <button id="confirm-update" onclick="disableUpdating()">Confirm Update</button>
+    <table id="userTable">
+      <tr>
+        <th>Email</th>
+        <th>Name</th>
+        <th>Role</th>
+        <th>Status</th>
+        <th>Action</th>
+      </tr>
+      {% for user in users %}
+      <tr>
+        <td contenteditable="false">{{ user[0] }}</td>
+        <td contenteditable="false">{{ user[1] }}</td>
+        <td>
+          <select disabled>
+            <option value="admin" {% if user[2] == 'admin' %}selected{% endif %}>Admin</option>
+            <option value="basicUser" {% if user[2] == 'basicUser' %}selected{% endif %}>Bronze</option>
+            <option value="vipUser" {% if user[2] == 'vipUser' %}selected{% endif %}>Gold</option>
+          </select>
+        </td>
+        <td>
+            <select disabled>
+                <option value="True">True</option>
+                <option value="False">False</option>
+            </select>
+        </td>
+        <td>
+
+            {%if user[2].lower() != 'admin'%}
+            <button onclick="deleteRow(this)">Delete</button>
+            {%endif%}
+        </td>
+      </tr>
+      {% endfor %}
+    </table>
+  </body>
+</html>
