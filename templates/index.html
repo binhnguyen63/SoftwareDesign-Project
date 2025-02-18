@@ -2,33 +2,56 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <title>Microsoft Identity Python Web App: Index</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>User Authentication</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        text-align: center;
+        margin-top: 100px;
+      }
+      .container {
+        max-width: 400px;
+        margin: auto;
+        padding: 20px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+      }
+      h2 {
+        color: #333;
+      }
+      .btn {
+        display: inline-block;
+        padding: 10px 20px;
+        margin: 10px;
+        text-decoration: none;
+        color: white;
+        background-color: #0078d4;
+        border-radius: 5px;
+        font-weight: bold;
+      }
+      .btn:hover {
+        background-color: #005a9e;
+      }
+    </style>
   </head>
   <body>
-    <h1>Microsoft Identity Python Web App</h1>
-    <h2>Welcome {{ user.get("name") }}!</h2>
+    <div class="container">
+      {% if user %}
+      <h2>Welcome, {{ user.name }}!</h2>
+      <p>Email: {{ user.email }}</p>
+      <div>
+        <a href="{{ url_for('admin_dash') }}">Go To Admin DashBoard</a>
+      </div>
 
-    <ul>
-      {% if config.get("ENDPOINT") %}
-      <li><a href="/call_downstream_api">Call a downstream API</a></li>
-      {% endif %} {% if config.get("B2C_PROFILE_AUTHORITY") %}
-      <li>
-        <a
-          href='{{config.get("B2C_PROFILE_AUTHORITY")}}?client_id={{config.get("CLIENT_ID")}}'
-          >Edit Profile</a
-        >
-      </li>
-      {% endif %} {% if user.get("preferred_username").lower() ==
-      config.get("ADMIN")%}
-      <a href="/admin">Go to Admin Dashboard</a>
+      <a class="btn" href="{{ url_for('logout') }}">Log Out</a>
+
+      {% else %}
+      <h2>Welcome to the User Management System</h2>
+      <p>Please log in with your Office365 account.</p>
+      <a class="btn" href="{{ url_for('login') }}">Log In</a>
       {% endif %}
-
-      <li><a href="/logout">Logout</a></li>
-    </ul>
-
-    <hr />
-    <footer style="text-align: right">
-      Powered by Identity Web {{ version }}
-    </footer>
+    </div>
   </body>
 </html>

@@ -13,6 +13,7 @@
         let table = document.getElementById("userTable");
         let confirmCreateBtn = document.getElementById("confirm-create-btn")
         let createBtn = document.getElementById("create-btn")
+        document.getElementById("update").disabled = true
         createBtn.style.display = "none"
         confirmCreateBtn.style.display = "inline"
         let row = table.insertRow(-1);
@@ -43,32 +44,83 @@
 
       function confirmAddRow() {
         let table = document.getElementById("userTable");
-        let confirmCreateBtn = document.getElementById("confirm-create-btn")
-        let createBtn = document.getElementById("create-btn")
-        createBtn.style.display = "inline"
-        confirmCreateBtn.style.display = "none"
-        for (let i = 1; i < table.rows.length; i++) {
-          for (let j = 0; j < 4; j++) {
-            table.rows[i].cells[j].contentEditable = "false";
-            const dropDownEle = table.rows[i].cells[j].querySelector("select")
-            console.log(dropDownEle)
-            if (dropDownEle) dropDownEle.disabled = true
-          }
-        }
-      }
+        let confirmCreateBtn = document.getElementById("confirm-create-btn");
+        let createBtn = document.getElementById("create-btn");
 
-      function deleteRow(button) {
+        
+        // Loop through each row (starting from 1 because the first row is header)
+        for (let i = 1; i < table.rows.length; i++) {
+            // Check if all fields are filled out
+            let email = table.rows[i].cells[0].innerText.trim();
+            let name = table.rows[i].cells[1].innerText.trim();
+            let role = table.rows[i].cells[2].querySelector("select").value;
+            let status = table.rows[i].cells[3].querySelector("select").value;
+
+            if (!email || !name || !role || !status) {
+            alert("Please fill in all fields.");
+            return; // Exit the function if any field is empty
+            }
+
+            // Disable editing once fields are confirmed
+            table.rows[i].cells[0].contentEditable = "false";
+            table.rows[i].cells[1].contentEditable = "false";
+            const dropDownEleRole = table.rows[i].cells[2].querySelector("select");
+            const dropDownEleStatus = table.rows[i].cells[3].querySelector("select");
+
+            if (dropDownEleRole) dropDownEleRole.disabled = true;
+            if (dropDownEleStatus) dropDownEleStatus.disabled = true;
+
+            // Call the addUser function to store the new user in the database
+            if (i === table.rows.length-1) addUser(email, name, role, status);
+        }
+        document.getElementById("update").disabled = false
+        createBtn.style.display = "inline";
+        confirmCreateBtn.style.display = "none";
+        }
+
+        function addUser(email, name, role, status) {
+        // Create the POST request to send data to the backend (Flask route)
+        fetch("/add_user", {
+            method: "POST",
+            headers: {
+            "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+            email: email,
+            name: name,
+            role: role,
+            status: status,
+            }),
+        })
+            .then((response) => {
+            if (response.ok) {
+                alert("User added successfully!");
+                location.reload(); // Reload the page to reflect changes
+            } else {
+                alert("Error adding user.");
+            }
+            })
+            .catch((error) => {
+            alert("Error: " + error);
+            });
+        }
+
+
+      function deleteRow(button,email) {
         let row = button.parentNode.parentNode;
+        console.log(row)
         row.parentNode.removeChild(row);
+        deleteUser(email)
       }
 
       function enableEditing() {
         document.getElementById("update").style.display = "none";
         document.getElementById("confirm-update").style.display = "inline";
+        document.getElementById("create-btn").disabled = true
         let table = document.getElementById("userTable");
         for (let i = 1; i < table.rows.length; i++) {
           if (table.rows[i].cells[2].querySelector("select").value.toLowerCase() === "admin") continue;
-          for (let j = 0; j < 4; j++) {
+          for (let j = 1; j < 4; j++) {
             table.rows[i].cells[j].contentEditable = "true";
             console.log(table.rows[i].cells[j])
             const dropDownEle = table.rows[i].cells[j].querySelector("select")
@@ -77,25 +129,87 @@
           }
         }
       }
-      function disableUpdating() {
+      function confirmUpdate() {
         document.getElementById("update").style.display = "inline";
         document.getElementById("confirm-update").style.display = "none";
         let table = document.getElementById("userTable");
+        let updatedUsers = []
         for (let i = 1; i < table.rows.length; i++) {
-          for (let j = 0; j < 4; j++) {
-            table.rows[i].cells[j].contentEditable = "false";
-            const dropDownEle = table.rows[i].cells[j].querySelector("select")
-            if (dropDownEle) dropDownEle.disabled = true
-          }
+            if (table.rows[i].cells[1].contentEditable === "true") {
+                let email = table.rows[i].cells[0].innerText.trim();
+                let name = table.rows[i].cells[1].innerText.trim();
+                let role = table.rows[i].cells[2].querySelector("select").value;
+                let status = table.rows[i].cells[3].querySelector("select").value;
+                updatedUsers.push({email,name,role,status})
+            
+                for (let j = 0; j < 4; j++) {
+
+                table.rows[i].cells[j].contentEditable = "false";
+                const dropDownEle = table.rows[i].cells[j].querySelector("select")
+                if (dropDownEle) dropDownEle.disabled = true
+                }
+            }
         }
+        console.log(updatedUsers)
+        if (updatedUsers.length > 0) {
+        fetch("/update_user", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ users: updatedUsers }),
+        })
+        .then((response) => {
+            if (response.ok) {
+                alert("User(s) updated successfully!");
+                document.getElementById("create-btn").disabled = true
+                location.reload(); // Reload the page to reflect changes
+            } else {
+                alert("Error updating user(s).");
+            }
+        })
+        .catch((error) => {
+            alert("Error: " + error);
+        });
+    }
       }
+
+      function deleteUser(email) {
+    // Confirm before sending the delete request
+    if (confirm('Are you sure you want to delete this user?')) {
+        fetch('/delete_user', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                email: email,  // Email of the user to be deleted
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Handle the response after deletion
+            if (data.message === "User deleted") {
+                alert("User has been deleted successfully!");
+                // Optionally, remove the user row from the table if needed
+                document.getElementById("user-" + email).remove();
+            } else {
+                alert("Failed to delete user.");
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    }
+}
+
     </script>
   </head>
   <body>
     <button id="create-btn" onclick="addRow()">Create</button>
     <button id="confirm-create-btn" onclick="confirmAddRow()">Confirm Create</button>
     <button id="update" onclick="enableEditing()">Update</button>
-    <button id="confirm-update" onclick="disableUpdating()">Confirm Update</button>
+    <button id="confirm-update" onclick="confirmUpdate()">Confirm Update</button>
     <table id="userTable">
       <tr>
         <th>Email</th>
@@ -111,20 +225,21 @@
         <td>
           <select disabled>
             <option value="admin" {% if user[2] == 'admin' %}selected{% endif %}>Admin</option>
-            <option value="basicUser" {% if user[2] == 'basicUser' %}selected{% endif %}>Bronze</option>
-            <option value="vipUser" {% if user[2] == 'vipUser' %}selected{% endif %}>Gold</option>
+            <option value="basicUser" {% if user[2] == 'basicUser' %}selected{% endif %}>basicUser</option>
+            <option value="vipUser" {% if user[2] == 'vipUser' %}selected{% endif %}>vipUser</option>
           </select>
         </td>
         <td>
             <select disabled>
-                <option value="True">True</option>
-                <option value="False">False</option>
+                <option value="True" {% if user[3]%}selected{%endif%}>True</option>
+                <option value="False" {% if not user[3]%}selected{%endif%}>False</option>
             </select>
         </td>
         <td>
 
             {%if user[2].lower() != 'admin'%}
-            <button onclick="deleteRow(this)">Delete</button>
+            <button onclick="deleteRow(this, '{{ user[0] }}')">Delete</button>
+
             {%endif%}
         </td>
       </tr>
