@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS users (
 );
 
 INSERT INTO users (email, name, role, status)
-VALUES (LOWER('tbnguy36@CougarNet.UH.EDU'), 'Nguyen, Binh', 'admin', FALSE)
+VALUES (LOWER('tbnguy36@CougarNet.UH.EDU'), 'Nguyen, Binh', 'admin', TRUE)
 ON CONFLICT (email) DO NOTHING;
 """
 

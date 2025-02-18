@@ -132,6 +132,7 @@
       function confirmUpdate() {
         document.getElementById("update").style.display = "inline";
         document.getElementById("confirm-update").style.display = "none";
+        
         let table = document.getElementById("userTable");
         let updatedUsers = []
         for (let i = 1; i < table.rows.length; i++) {
@@ -162,7 +163,7 @@
         .then((response) => {
             if (response.ok) {
                 alert("User(s) updated successfully!");
-                document.getElementById("create-btn").disabled = true
+                
                 location.reload(); // Reload the page to reflect changes
             } else {
                 alert("Error updating user(s).");
@@ -172,7 +173,8 @@
             alert("Error: " + error);
         });
     }
-      }
+    document.getElementById("create-btn").disabled = false
+    }
 
       function deleteUser(email) {
     // Confirm before sending the delete request
