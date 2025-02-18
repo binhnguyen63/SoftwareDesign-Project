@@ -22,6 +22,23 @@ VALUES (LOWER('tbnguy36@CougarNet.UH.EDU'), 'Nguyen, Binh', 'admin', TRUE)
 ON CONFLICT (email) DO NOTHING;
 """
 
+def get_user_by_email(email):
+    if not email:
+        return None
+    """Retrieve a specific user from the database by email."""
+    g.db_cursor.execute("SELECT email, name, role, status FROM users WHERE email = %s", (email,))
+    user = g.db_cursor.fetchone()
+
+    if user:
+        return {
+            "email": user[0],
+            "name": user[1],
+            "role": user[2],
+            "status": user[3],
+        }
+    return None  # Return None if the user is not found
+
+
 @app.before_request
 def before_request():
     """Create a database connection before each request."""
@@ -173,7 +190,10 @@ def auth_response():
 @app.route("/")
 def index():
     user = session.get("user")  # Get user info from session
-    return render_template("index.html", user=user)
+    userinfo = None
+    if user:
+        userinfo = get_user_by_email(user['email'])
+    return render_template("index.html", user=userinfo)
 
 # Logout
 @app.route("/logout")
@@ -183,6 +203,12 @@ def logout():
 
 @app.route("/admin")
 def admin_dash():
+    user = session.get("user")
+    if not user:
+        return "Forbidden", 403
+    userInfo = get_user_by_email(user['email'])
+    if (userInfo['role'].lower() != "admin"):
+        return "Forbidden", 403
     g.db_cursor.execute("SELECT * FROM users")
     users = g.db_cursor.fetchall()
     print("users: ", users)

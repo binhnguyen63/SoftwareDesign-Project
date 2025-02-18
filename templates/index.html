@@ -41,10 +41,11 @@
       {% if user %}
       <h2>Welcome, {{ user.name }}!</h2>
       <p>Email: {{ user.email }}</p>
+      {% if user.role.lower() == 'admin'%}
       <div>
         <a href="{{ url_for('admin_dash') }}">Go To Admin DashBoard</a>
       </div>
-
+      {%endif%}
       <a class="btn" href="{{ url_for('logout') }}">Log Out</a>
 
       {% else %}
