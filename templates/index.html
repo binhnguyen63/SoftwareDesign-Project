@@ -35,19 +35,66 @@
         background-color: #005a9e;
       }
     </style>
+    <script>
+      // This function will send a request to reactivate the user
+      function reactivateAccount() {
+        // Get the user's email from the page, assuming it's in a hidden input or elsewhere
+        const userEmail = "{{ user.email }}"; // You can pass this dynamically from Flask
+
+        // Send a POST request with the email
+        fetch("/reactivate", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ email: userEmail }), // Send the email in the request body
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            if (data.success) {
+              alert("Your account has been reactivated.");
+              location.reload(); // Optionally reload the page to update the status
+            } else {
+              alert("Error reactivating the account.");
+            }
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+            alert("An error occurred.");
+          });
+      }
+    </script>
   </head>
   <body>
     <div class="container">
-      {% if user %}
+      {% if user %} {% if user.status %}
       <h2>Welcome, {{ user.name }}!</h2>
       <p>Email: {{ user.email }}</p>
-      {% if user.role.lower() == 'admin'%}
+      {% if user.role.lower() == 'admin' %}
       <div>
         <a href="{{ url_for('admin_dash') }}">Go To Admin DashBoard</a>
       </div>
-      {%endif%}
-      <a class="btn" href="{{ url_for('logout') }}">Log Out</a>
+      {% endif %} {% else %}
+      <h2>
+        Your account is deactivated. Do you want to reactivate your account?
+      </h2>
+      <div>
+        <a>
+          <button class="reactivate-btn" onclick="reactivateAccount()">
+            Reactivate please
+          </button>
+        </a>
 
+        <a href="{{ url_for('logout') }}">
+          <button class="refuse-reactivate-btn""">
+            Don't reactivate and log out
+          </button>
+        </a>
+
+      </div>
+
+      {% endif %}
+      <a class="btn" href="{{ url_for('logout') }}">Log Out</a>
       {% else %}
       <h2>Welcome to the User Management System</h2>
       <p>Please log in with your Office365 account.</p>

@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS users (
 );
 
 INSERT INTO users (email, name, role, status)
-VALUES (LOWER('tbnguy36@CougarNet.UH.EDU'), 'Nguyen, Binh', 'admin', TRUE)
+VALUES (LOWER('tbnguy36@CougarNet.UH.EDU'), 'Nguyen, Binh', 'admin', FALSE)
 ON CONFLICT (email) DO NOTHING;
 """
 
@@ -193,6 +193,7 @@ def index():
     userinfo = None
     if user:
         userinfo = get_user_by_email(user['email'])
+    print(userinfo)
     return render_template("index.html", user=userinfo)
 
 # Logout
@@ -214,5 +215,25 @@ def admin_dash():
     print("users: ", users)
     return render_template("admin.html",users=users)
 
+@app.route("/reactivate", methods=["POST"])
+def reactivate_account():
+    try:
+        # Get the email from the request body
+        data = request.get_json()  # Parse the JSON request
+        email = data.get('email')
+
+        if not email:
+            return jsonify({"success": False, "message": "No email provided"}), 400
+        
+        # Reactivate the user's account (update the database)
+        g.db_cursor.execute("UPDATE users SET status = %s WHERE email = %s", (True, email))  # Assuming True means active
+        g.db_cursor.connection.commit()  # Commit the changes to the database
+        
+        return jsonify({"success": True, "message": "Account reactivated successfully"})
+    
+    except Exception as e:
+        print(f"Error reactivating account: {e}")
+        return jsonify({"success": False, "message": "An error occurred while reactivating the account"}), 500
+    
 if __name__ == "__main__":
     app.run(host='localhost', port=5002)
