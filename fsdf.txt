@@ -1,2 +1,0 @@
-test if users with deaxtivated acc can log in 
-test if reeg user can go to admin dash

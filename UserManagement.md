@@ -1,0 +1,12 @@
+- This is a web page that allow you to log in with Microsoft Office365 account.
+- You can follow the steps in README.MD to set up this project
+- The default page to this site is http://localhost:5002/. But u can change the host in environemental variable
+- On the page, you will see a log in button
+- Everyone who log in on this page will have their information (email, name) stored in database PostgressSQL called venom.
+- If you are an admin, after logging in with your office 365 account, you will have access to admin dashboard where you can create, read, update and delete user accounts
+- There are three buttons in the dashboard: delete, create, and update
+- You can delete a user if you click on delete
+- You can update user's name, role, and status by clicking on update
+- You can create new users by clicking on create
+- You can reactivate/deactivate user by editing their status.
+- Finally, you can go back to index page and log out

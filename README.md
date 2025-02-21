@@ -1,8 +1,9 @@
+Team Vernon
+
 # COSC 4353 Project
 
-Team Vernon
 HOW TO RUN THIS PROGRAM
-We are using PostgresSQL with database named "venom"
+We are using PostgresSQL with database named "Vernon"
 
 Step 1 : set up env variable in this format
 
@@ -21,7 +22,7 @@ PORT = 5002
 
 DB_HOST = localhost
 DB_PORT =
-DB_NAME =
+DB_NAME = Vernon
 DB_USER =
 DB_PASSWORD =
 
