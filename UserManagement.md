@@ -1,4 +1,4 @@
-- This is a web page that allow you to log in with Microsoft Office365 account.
+- This is a web page that allow you to log in with Microsoft Office365 account. It uses Flask and PostgresSQL, and Microsoft Graph API
 - You can follow the steps in README.MD to set up this project
 - The default page to this site is http://localhost:5002/. But u can change the host in environemental variable
 - On the page, you will see a log in button
