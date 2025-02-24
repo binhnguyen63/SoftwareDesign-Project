@@ -3,7 +3,7 @@ Team Vernon
 # COSC 4353 Project
 
 HOW TO RUN THIS PROGRAM
-We are using PostgresSQL with database named "Vernon"
+We are using PostgresSQL with database named "vernon"
 
 # Step 1 : set up env variable in this format
 
@@ -14,7 +14,7 @@ CLIENT_SECRET=
 PORT = 5002
 DB_HOST = localhost
 DB_PORT =
-DB_NAME = Vernon
+DB_NAME = vernon
 DB_USER =
 DB_PASSWORD =
 
