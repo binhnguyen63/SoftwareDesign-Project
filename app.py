@@ -3,24 +3,40 @@ from flask import Flask, redirect, request, session, url_for, render_template,g,
 import app_config
 import psycopg2
 from urllib.parse import urlencode
-
+import os
+import base64
 
 app = Flask(__name__)
 app.config.from_object(app_config)
 app.secret_key = "your_secret_key_here"  # Set a unique and secret key
+SAVE_DIR = "saved_tex_files"
+os.makedirs(SAVE_DIR, exist_ok=True)
+
 
 createDatabase = """
 CREATE TABLE IF NOT EXISTS users (
     email VARCHAR(255) PRIMARY KEY,
     name VARCHAR(255),
     role VARCHAR(255),
-    status BOOLEAN
+    status BOOLEAN,
+    graduate_petition_form TEXT,
+    signature_graduate_petition_form BYTEA
 );
 
 INSERT INTO users (email, name, role, status)
-VALUES (LOWER('tbnguy36@CougarNet.UH.EDU'), 'Nguyen, Binh', 'admin', TRUE)
+VALUES 
+    (LOWER('tbnguy36@CougarNet.UH.EDU'), 'Nguyen, Binh', 'admin', TRUE),
+    (LOWER('john.doe@CougarNet.UH.EDU'), 'John Doe', 'basicUser', TRUE),
+    (LOWER('jane.smith@CougarNet.UH.EDU'), 'Jane Smith', 'basicUser', FALSE),
+    (LOWER('alice.johnson@CougarNet.UH.EDU'), 'Alice Johnson', 'vipUser', TRUE),
+    (LOWER('bob.williams@CougarNet.UH.EDU'), 'Bob Williams', 'vipUser', FALSE)
 ON CONFLICT (email) DO NOTHING;
+
 """
+def save_signature(base64_str):
+    image_data = base64.b64decode(base64_str.split(",")[1])  # Remove header
+    with open("signature.png", "wb") as f:
+        f.write(image_data)
 
 def get_user_by_email(email):
     if not email:
@@ -234,6 +250,76 @@ def reactivate_account():
     except Exception as e:
         print(f"Error reactivating account: {e}")
         return jsonify({"success": False, "message": "An error occurred while reactivating the account"}), 500
+
+@app.route("/graduate-student-petition-form")
+def handleGraduateStudentPetitionForm():
+    user = session.get("user")
+    userName = user['name'].split(",")
+
+    print(userName)
+    return render_template("forms/graduate_student_petition_form.html",userName=userName)
+
+# @app.route('/user-forms')
+# def user_forms():
     
+
+@app.route('/update-latex', methods=['POST'])
+def update_latex():
+    try:
+        user = session.get("user")
+        if not user or "email" not in user:
+            return jsonify({"error": "User not authenticated"}), 401
+
+        data = request.get_json()
+        latex_content = data.get("content")
+        signature_base64 = data.get("signature")
+
+        if latex_content is None:
+            return jsonify({"error": "Missing LaTeX content"}), 400
+
+        # Convert signature from Base64 to binary
+        signature_binary = None
+        if signature_base64:
+            try:
+                signature_binary = base64.b64decode(signature_base64.split(",")[1])
+            except (IndexError, ValueError):
+                return jsonify({"error": "Invalid signature format"}), 400
+
+        # Update both columns
+
+        query = '''
+            UPDATE users 
+            SET graduate_petition_form = %s, signature_graduate_petition_form = %s 
+            WHERE email = %s
+        '''
+        print("here 1")
+        print(user["email"].lower().strip())
+        g.db_cursor.execute(query, (latex_content, psycopg2.Binary(signature_binary) 
+        if signature_binary else None, user["email"].lower()))
+
+        g.db_conn.commit()
+        print("here 2")
+        query = """
+            SELECT *
+            FROM users
+            WHERE email = %s
+        """
+        g.db_cursor.execute(query, (user["email"].lower().strip(),))
+        updated_row = g.db_cursor.fetchone()
+        updated_row_list = list(updated_row)  # Convert tuple to list for modification
+        if isinstance(updated_row_list[5], memoryview):  # Assuming signature is at index 5
+            updated_row_list[5] = bytes(updated_row_list[5])  # Convert to bytes
+        # print("updated row: ", updated_row_list)
+        # updated_row = g.db_cursor.fetchone()
+        if not updated_row:
+                
+            return jsonify({"error": "No row updated. User may not exist"}), 404
+
+        return jsonify({"message": "LaTeX and signature updated"})
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
 if __name__ == "__main__":
     app.run(host='localhost', port=5002)
