@@ -1,0 +1,5 @@
+user landing Page
+navigation button
+features for each roles
+ability to change admin role
+

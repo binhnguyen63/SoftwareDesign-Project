@@ -309,7 +309,7 @@ def update_latex():
         updated_row_list = list(updated_row)  # Convert tuple to list for modification
         if isinstance(updated_row_list[5], memoryview):  # Assuming signature is at index 5
             updated_row_list[5] = bytes(updated_row_list[5])  # Convert to bytes
-        # print("updated row: ", updated_row_list)
+        print("updated row: ", updated_row_list[4])
         # updated_row = g.db_cursor.fetchone()
         if not updated_row:
                 
