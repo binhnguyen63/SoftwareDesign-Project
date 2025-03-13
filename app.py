@@ -28,13 +28,15 @@ CREATE TABLE IF NOT EXISTS users (
 INSERT INTO users (email, name, role, status)
 VALUES 
     (LOWER('tbnguy36@CougarNet.UH.EDU'), 'Nguyen, Binh', 'admin', TRUE),
+    (LOWER('fmmancil@cougarnet.uh.edu'), 'Mancilla, Fernando', 'admin', TRUE)
     (LOWER('john.doe@CougarNet.UH.EDU'), 'John Doe', 'basicUser', TRUE),
     (LOWER('jane.smith@CougarNet.UH.EDU'), 'Jane Smith', 'basicUser', FALSE),
     (LOWER('alice.johnson@CougarNet.UH.EDU'), 'Alice Johnson', 'vipUser', TRUE),
     (LOWER('bob.williams@CougarNet.UH.EDU'), 'Bob Williams', 'vipUser', FALSE)
 ON CONFLICT (email) DO NOTHING;
 
-"""
+""" 
+
 def save_signature(base64_str):
     image_data = base64.b64decode(base64_str.split(",")[1])  # Remove header
     with open("signature.png", "wb") as f:
@@ -446,3 +448,4 @@ def show_pdf():
 
 if __name__ == "__main__":
     app.run(host='localhost', port=5002)
+# hi
