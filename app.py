@@ -1,10 +1,12 @@
 import requests
-from flask import Flask, redirect, request, session, url_for, render_template,g,jsonify
+from flask import Flask, redirect, request, session, url_for, render_template,g,jsonify, Response
 import app_config
 import psycopg2
 from urllib.parse import urlencode
 import os
+import subprocess
 import base64
+import io
 
 app = Flask(__name__)
 app.config.from_object(app_config)
@@ -320,6 +322,127 @@ def update_latex():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+@app.route("/show_pdf", methods=["POST"])
+def show_pdf():
+    data = request.get_json()
+
+    if not data or "userEmail" not in data:
+        return jsonify({"error": "Missing LaTeX content"}), 400
+
+    userEmail = data["userEmail"]
+    print("got user email: ", userEmail)
+
+    # Fetch LaTeX content and signature image from the database
+    query_latex = """
+    SELECT graduate_petition_form, signature_graduate_petition_form
+    FROM users
+    WHERE email = %s
+    """
+    g.db_cursor.execute(query_latex, (userEmail,))
+    result = g.db_cursor.fetchone()
+
+    if not result or not result[0]:
+        return jsonify({"error": "No LaTeX content found for this user"}), 404
+    
+    full_latex = """
+    \\documentclass[a4paper,12pt]{article}
+    \\usepackage{geometry}
+    \\geometry{top=1in, bottom=1in, left=1in, right=1in}
+    \\usepackage{longtable}
+    \\usepackage{amsmath}
+    \\usepackage{graphicx}
+
+    \\title{Graduate Student Petition Form}
+    \\author{University of Houston}
+    \\date{}
+
+    \\begin{document}
+
+    \\maketitle
+
+    \\section*{Student Information}
+    \\begin{tabbing}
+    First Name: \\hspace{3cm} \\= \\underline{\\hspace{5cm} nguyen} \\\\
+    Middle Name: \\> \\underline{\\hspace{5cm} } \\\\
+    Last Name: \\> \\underline{\\hspace{5cm}  binh} \\\\
+    UH ID: \\> \\underline{\\hspace{5cm} 45783} \\\\
+    Contact Phone: \\> \\underline{\\hspace{5cm} (232) 561-3127} \\\\
+    \\end{tabbing}
+
+    \\section*{Current Student Information}
+    \\begin{tabbing}
+    Program: \\hspace{3cm} \\= \\underline{\\hspace{5cm} SOCW} \\\\
+    Career: \\> \\underline{\\hspace{5cm} Law} \\\\
+    \\end{tabbing}
+
+    \\section*{Petition Effective}
+    \\begin{tabbing}
+    Effective Term: \\hspace{2cm} \\= \\underline{\\hspace{5cm} Spring} \\\\
+    Year: \\> \\underline{\\hspace{5cm} 2024} \\\\
+    \\end{tabbing}
+
+    \\section*{Purpose of Petition}
+    \\begin{enumerate}
+        \\item Update programs status/action (term activate, discontinue, etc) \\hfill [yes]
+        \\item Admissions status change (e.g. conditional to unconditional) \\hfill [yes]
+        \\item Add new concurrent degree or certificate objective (career/program/plan) \\hfill [no]
+        \\item Change current degree objective (program/plan) \\hfill [no]
+        \\item Degree requirement exception or approved course substitution \\hfill [yes]
+        \\item Leave of Absence (include specific term) \\hfill [no]
+        \\item Reinstatement to discontinued Career (provide explanation) \\hfill [yes]
+        \\item Request to apply to graduate after the late filing period deadline \\hfill [undefined]
+        \\item Transfer Credit \\hfill [yes]
+        \\item Change Admit Term \\hfill [no]
+        \\item Early Submission of Thesis/Dissertation \\hfill [no]
+        \\item Other (explain below) \\hfill [no]
+    \\end{enumerate}
+
+    \\section*{Explanation of Request}
+    \\begin{flushleft}
+    \\underline{\\hspace{15cm}} This is a random explanation for the petition request. \\\\
+    \\end{flushleft}
+
+    \\section*{Signature Section}
+    Student Signature: \\\\
+    \\includegraphics[width=7cm]{signature.png}
+
+    \\end{document}
+    """
+
+    signature_image_data = result[1]
+
+    print("LaTeX content fetched: ", full_latex)
+
+    # Decode and save the signature image (if available)
+    print(signature_image_data)
+    if signature_image_data:
+        with open("signature.png", "wb") as f:
+            f.write(signature_image_data)
+        print("Signature image saved as signature.png")
+    # save_signature(signature_image_data)
+
+    tex_bytes = full_latex.encode("utf-8")
+    pdf_output = io.BytesIO()
+
+    # Compile LaTeX to PDF
+    process = subprocess.run(
+        ["pdflatex", "-interaction=nonstopmode", "-jobname=output"],
+        input=tex_bytes,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE
+    )
+
+    if process.returncode != 0:
+        print("LaTeX compilation failed with error:", process.stderr.decode())
+        return jsonify({"error": process.stderr.decode()}), 500
+
+    # Read generated PDF into memory
+    with open("output.pdf", "rb") as f:
+        pdf_output.write(f.read())
+
+    pdf_output.seek(0)
+
+    return Response(pdf_output, mimetype="application/pdf")
 
 if __name__ == "__main__":
     app.run(host='localhost', port=5002)
