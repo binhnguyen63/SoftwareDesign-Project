@@ -1,15 +1,19 @@
-all: petition.pdf
+# Set default filename (change dynamically from Python)
+TEX_FILE ?= petition
+PDF_FILE = $(TEX_FILE).pdf
 
-petition.pdf: petition.tex
-	pdflatex petition.tex
+all: $(PDF_FILE)
+
+$(PDF_FILE): $(TEX_FILE).tex
+	pdflatex -interaction=nonstopmode $(TEX_FILE).tex
 
 clean:
-	rm -f *.aux *.log *.out *.toc petition.pdf
+	rm -f *.aux *.log *.out *.toc $(PDF_FILE) $(TEX_FILE).tex $(TEX_FILE)_signature.png
 
-view: petition.pdf
+view: $(PDF_FILE)
 	@case "$$(uname)" in \
-		Darwin) open petition.pdf ;; \
-		Linux) xdg-open petition.pdf || gio open petition.pdf ;; \
-		CYGWIN*|MINGW32*|MSYS*|MINGW*) cygstart petition.pdf || start petition.pdf ;; \
+		Darwin) open $(PDF_FILE) ;; \
+		Linux) xdg-open $(PDF_FILE) || gio open $(PDF_FILE) ;; \
+		CYGWIN*|MINGW32*|MSYS*|MINGW*) cygstart $(PDF_FILE) || start $(PDF_FILE) ;; \
 		*) echo "Unsupported OS"; exit 1 ;; \
 	esac

@@ -28,14 +28,16 @@ CREATE TABLE IF NOT EXISTS users (
 INSERT INTO users (email, name, role, status)
 VALUES 
     (LOWER('tbnguy36@CougarNet.UH.EDU'), 'Nguyen, Binh', 'admin', TRUE),
-    (LOWER('fmmancil@cougarnet.uh.edu'), 'Mancilla, Fernando', 'admin', TRUE)
+    (LOWER('fmmancil@cougarnet.uh.edu'), 'Mancilla, Fernando', 'admin', TRUE),
+    (LOWER('rlpham3@cougarnet.uh.edu'), 'Pham, Ryan', 'admin', TRUE),
     (LOWER('john.doe@CougarNet.UH.EDU'), 'John Doe', 'basicUser', TRUE),
     (LOWER('jane.smith@CougarNet.UH.EDU'), 'Jane Smith', 'basicUser', FALSE),
     (LOWER('alice.johnson@CougarNet.UH.EDU'), 'Alice Johnson', 'vipUser', TRUE),
     (LOWER('bob.williams@CougarNet.UH.EDU'), 'Bob Williams', 'vipUser', FALSE)
 ON CONFLICT (email) DO NOTHING;
 
-""" 
+"""
+
 
 def save_signature(base64_str):
     image_data = base64.b64decode(base64_str.split(",")[1])  # Remove header
@@ -334,7 +336,6 @@ def show_pdf():
     userEmail = data["userEmail"]
     print("got user email: ", userEmail)
 
-    # Fetch LaTeX content and signature image from the database
     query_latex = """
     SELECT graduate_petition_form, signature_graduate_petition_form
     FROM users
@@ -345,106 +346,36 @@ def show_pdf():
 
     if not result or not result[0]:
         return jsonify({"error": "No LaTeX content found for this user"}), 404
-    
-    full_latex = """
-    \\documentclass[a4paper,12pt]{article}
-    \\usepackage{geometry}
-    \\geometry{top=1in, bottom=1in, left=1in, right=1in}
-    \\usepackage{longtable}
-    \\usepackage{amsmath}
-    \\usepackage{graphicx}
 
-    \\title{Graduate Student Petition Form}
-    \\author{University of Houston}
-    \\date{}
+    full_latex = result[0]  # Fetch LaTeX content from the database
+    signature_image_data = result[1]  # Fetch signature image
+    file_name = f"{userEmail}_petition"
+    # Save the LaTeX content to a file
+    with open(f"{file_name}.tex", "w", encoding="utf-8") as f:
+        f.write(full_latex)
 
-    \\begin{document}
-
-    \\maketitle
-
-    \\section*{Student Information}
-    \\begin{tabbing}
-    First Name: \\hspace{3cm} \\= \\underline{\\hspace{5cm} nguyen} \\\\
-    Middle Name: \\> \\underline{\\hspace{5cm} } \\\\
-    Last Name: \\> \\underline{\\hspace{5cm}  binh} \\\\
-    UH ID: \\> \\underline{\\hspace{5cm} 45783} \\\\
-    Contact Phone: \\> \\underline{\\hspace{5cm} (232) 561-3127} \\\\
-    \\end{tabbing}
-
-    \\section*{Current Student Information}
-    \\begin{tabbing}
-    Program: \\hspace{3cm} \\= \\underline{\\hspace{5cm} SOCW} \\\\
-    Career: \\> \\underline{\\hspace{5cm} Law} \\\\
-    \\end{tabbing}
-
-    \\section*{Petition Effective}
-    \\begin{tabbing}
-    Effective Term: \\hspace{2cm} \\= \\underline{\\hspace{5cm} Spring} \\\\
-    Year: \\> \\underline{\\hspace{5cm} 2024} \\\\
-    \\end{tabbing}
-
-    \\section*{Purpose of Petition}
-    \\begin{enumerate}
-        \\item Update programs status/action (term activate, discontinue, etc) \\hfill [yes]
-        \\item Admissions status change (e.g. conditional to unconditional) \\hfill [yes]
-        \\item Add new concurrent degree or certificate objective (career/program/plan) \\hfill [no]
-        \\item Change current degree objective (program/plan) \\hfill [no]
-        \\item Degree requirement exception or approved course substitution \\hfill [yes]
-        \\item Leave of Absence (include specific term) \\hfill [no]
-        \\item Reinstatement to discontinued Career (provide explanation) \\hfill [yes]
-        \\item Request to apply to graduate after the late filing period deadline \\hfill [undefined]
-        \\item Transfer Credit \\hfill [yes]
-        \\item Change Admit Term \\hfill [no]
-        \\item Early Submission of Thesis/Dissertation \\hfill [no]
-        \\item Other (explain below) \\hfill [no]
-    \\end{enumerate}
-
-    \\section*{Explanation of Request}
-    \\begin{flushleft}
-    \\underline{\\hspace{15cm}} This is a random explanation for the petition request. \\\\
-    \\end{flushleft}
-
-    \\section*{Signature Section}
-    Student Signature: \\\\
-    \\includegraphics[width=7cm]{signature.png}
-
-    \\end{document}
-    """
-
-    signature_image_data = result[1]
-
-    print("LaTeX content fetched: ", full_latex)
-
-    # Decode and save the signature image (if available)
-    print(signature_image_data)
+    # Save the signature image (if available)
     if signature_image_data:
-        with open("signature.png", "wb") as f:
+        with open(f"{file_name}_signature.png", "wb") as f:
             f.write(signature_image_data)
         print("Signature image saved as signature.png")
-    # save_signature(signature_image_data)
 
-    tex_bytes = full_latex.encode("utf-8")
-    pdf_output = io.BytesIO()
-
-    # Compile LaTeX to PDF
-    process = subprocess.run(
-        ["pdflatex", "-interaction=nonstopmode", "-jobname=output"],
-        input=tex_bytes,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE
-    )
+    # Run `make` to compile LaTeX
+    process = subprocess.run(["make",f"TEX_FILE={file_name}"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
     if process.returncode != 0:
-        print("LaTeX compilation failed with error:", process.stderr.decode())
+        print("Make failed with error:", process.stderr.decode())
         return jsonify({"error": process.stderr.decode()}), 500
 
     # Read generated PDF into memory
-    with open("output.pdf", "rb") as f:
+    pdf_output = io.BytesIO()
+    with open(f"{file_name}.pdf", "rb") as f:
         pdf_output.write(f.read())
 
     pdf_output.seek(0)
-
+    process = subprocess.run(["make","clean",f"TEX_FILE={file_name}"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     return Response(pdf_output, mimetype="application/pdf")
+
 
 if __name__ == "__main__":
     app.run(host='localhost', port=5002)
