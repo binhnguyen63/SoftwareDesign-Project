@@ -8,222 +8,7 @@
       href="{{ url_for('static', filename='css/admin.css') }}"
     />
     <title>Administrator</title>
-    <script>
-      function addRow() {
-        let table = document.getElementById("userTable");
-        let confirmCreateBtn = document.getElementById("confirm-create-btn")
-        let createBtn = document.getElementById("create-btn")
-        document.getElementById("update").disabled = true
-        createBtn.style.display = "none"
-        confirmCreateBtn.style.display = "inline"
-        let row = table.insertRow(-1);
-        for (let i = 0; i < 2; i++) {
-          let cell = row.insertCell(i);
-          cell.contentEditable = "true";
-        }
-        let roleCell = row.insertCell(2)
-        roleCell.innerHTML = `
-        <select>
-            <option value="admin">Admin</option>
-            <option value="basicUser" selected>basicUser</option>
-            <option value="vipUser">vipUser</option>
-          </select>
-          `
-        let statusCell = row.insertCell(3)
-        statusCell.innerHTML = `
-        <select>
-            <option value="True" selected>True</option>
-            <option value="False">False</option>
-        </select>
-        `
-        let deleteCell = row.insertCell(4);
-        deleteCell.innerHTML =
-          '<button onclick="deleteRow(this)">Delete</button>';
-
-      }
-
-      function confirmAddRow() {
-        let table = document.getElementById("userTable");
-        let confirmCreateBtn = document.getElementById("confirm-create-btn");
-        let createBtn = document.getElementById("create-btn");
-
-        
-        // Loop through each row (starting from 1 because the first row is header)
-        for (let i = 1; i < table.rows.length; i++) {
-            // Check if all fields are filled out
-            let email = table.rows[i].cells[0].innerText.trim();
-            let name = table.rows[i].cells[1].innerText.trim();
-            let role = table.rows[i].cells[2].querySelector("select").value;
-            let status = table.rows[i].cells[3].querySelector("select").value;
-
-            if (!email || !name || !role || !status) {
-            alert("Please fill in all fields.");
-            return; // Exit the function if any field is empty
-            }
-
-            // Disable editing once fields are confirmed
-            table.rows[i].cells[0].contentEditable = "false";
-            table.rows[i].cells[1].contentEditable = "false";
-            const dropDownEleRole = table.rows[i].cells[2].querySelector("select");
-            const dropDownEleStatus = table.rows[i].cells[3].querySelector("select");
-
-            if (dropDownEleRole) dropDownEleRole.disabled = true;
-            if (dropDownEleStatus) dropDownEleStatus.disabled = true;
-
-            // Call the addUser function to store the new user in the database
-            if (i === table.rows.length-1) addUser(email, name, role, status);
-        }
-        document.getElementById("update").disabled = false
-        createBtn.style.display = "inline";
-        confirmCreateBtn.style.display = "none";
-        }
-
-        function addUser(email, name, role, status) {
-        // Create the POST request to send data to the backend (Flask route)
-        fetch("/add_user", {
-            method: "POST",
-            headers: {
-            "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-            email: email,
-            name: name,
-            role: role,
-            status: status,
-            }),
-        })
-            .then((response) => {
-            if (response.ok) {
-                alert("User added successfully!");
-                location.reload(); // Reload the page to reflect changes
-            } else {
-                alert("Error adding user.");
-            }
-            })
-            .catch((error) => {
-            alert("Error: " + error);
-            });
-        }
-
-
-      function deleteRow(button,email) {
-        let row = button.parentNode.parentNode;
-        console.log(row)
-        row.parentNode.removeChild(row);
-        deleteUser(email)
-      }
-
-      function enableEditing() {
-        document.getElementById("update").style.display = "none";
-        document.getElementById("confirm-update").style.display = "inline";
-        document.getElementById("create-btn").disabled = true
-        let table = document.getElementById("userTable");
-        for (let i = 1; i < table.rows.length; i++) {
-          if (table.rows[i].cells[2].querySelector("select").value.toLowerCase() === "admin") continue;
-          for (let j = 1; j < 4; j++) {
-            table.rows[i].cells[j].contentEditable = "true";
-            console.log(table.rows[i].cells[j])
-            const dropDownEle = table.rows[i].cells[j].querySelector("select")
-            console.log(dropDownEle)
-            if (dropDownEle) dropDownEle.disabled = false
-          }
-        }
-      }
-      function confirmUpdate() {
-        document.getElementById("update").style.display = "inline";
-        document.getElementById("confirm-update").style.display = "none";
-        
-        let table = document.getElementById("userTable");
-        let updatedUsers = []
-        for (let i = 1; i < table.rows.length; i++) {
-            if (table.rows[i].cells[1].contentEditable === "true") {
-                let email = table.rows[i].cells[0].innerText.trim();
-                let name = table.rows[i].cells[1].innerText.trim();
-                let role = table.rows[i].cells[2].querySelector("select").value;
-                let status = table.rows[i].cells[3].querySelector("select").value;
-                updatedUsers.push({email,name,role,status})
-            
-                for (let j = 0; j < 4; j++) {
-
-                table.rows[i].cells[j].contentEditable = "false";
-                const dropDownEle = table.rows[i].cells[j].querySelector("select")
-                if (dropDownEle) dropDownEle.disabled = true
-                }
-            }
-        }
-        console.log(updatedUsers)
-        if (updatedUsers.length > 0) {
-        fetch("/update_user", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ users: updatedUsers }),
-        })
-        .then((response) => {
-            if (response.ok) {
-                alert("User(s) updated successfully!");
-                
-                location.reload(); // Reload the page to reflect changes
-            } else {
-                alert("Error updating user(s).");
-            }
-        })
-        .catch((error) => {
-            alert("Error: " + error);
-        });
-    }
-    document.getElementById("create-btn").disabled = false
-    }
-
-      function deleteUser(email) {
-    // Confirm before sending the delete request
-    if (confirm('Are you sure you want to delete this user?')) {
-        fetch('/delete_user', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                email: email,  // Email of the user to be deleted
-            })
-        })
-        .then(response => response.json())
-        .then(data => {
-            // Handle the response after deletion
-            if (data.message === "User deleted") {
-                alert("User has been deleted successfully!");
-                // Optionally, remove the user row from the table if needed
-                document.getElementById("user-" + email).remove();
-            } else {
-                alert("Failed to delete user.");
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-        });
-    }
-}
-
- function handlePdf(userEmail) {
-  event.preventDefault();
-  console.log("fetching user pdf: ", userEmail)
-  fetch("/show_pdf", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({userEmail})
-})
-.then(response => response.blob())
-.then(blob => {
-    const url = URL.createObjectURL(blob);
-    window.open(url); // Opens the PDF in a new tab
-}).catch(error => {
-  console.log("Error: ",error)
-});
-
- }
-
-    </script>
+    <script src="{{ url_for('static', filename='js/admin.js')}}" defer></script>
   </head>
   <body>
     <button id="create-btn" onclick="addRow()">Create</button>
@@ -235,9 +20,8 @@
         <th>Email</th>
         <th>Name</th>
         <th>Role</th>
-        <th>Status</th>
+        <th>Account Status</th>
         <th>Action</th>
-        <th>Graduate Student Petition Form</th>
       </tr>
       {% for user in users %}
       <tr>
@@ -252,8 +36,8 @@
         </td>
         <td>
             <select disabled>
-                <option value="True" {% if user[3]%}selected{%endif%}>True</option>
-                <option value="False" {% if not user[3]%}selected{%endif%}>False</option>
+                <option value="True" {% if user[3]%}selected{%endif%}>Active</option>
+                <option value="False" {% if not user[3]%}selected{%endif%}>Deactivated</option>
             </select>
         </td>
         <td>
@@ -262,19 +46,47 @@
 
             {%endif%}
         </td>
-        <td>
-          {%if user[4]%}
-          <a onclick="handlePdf('{{ user[0] }}',event)">pdf</a>
-          {%else%}
-          <a>Not submitted</a>
-          {%endif%}
-        </td>
+
       </tr>
       {% endfor %}
     </table>
-    <div id="submited-forms">
-      <ol>
-      </ol>
+    <table id="submitted-forms">
+      <tr>
+        <th>Form Id</th>
+        <th>Form</th>
+        <th>Email</th>
+        <th>Status</th>
+        <th>Action</th>
+        <th>Admin Approval Signature </th>
+      </tr>
+      {%for form in forms%}
+      {%if form[2]%}
+      <tr>
+        <td>{{form[0]}}</td>
+        <td onclick="viewForm('{{form[0]}}','{{form[1]}}')" id="form-name">{{form[2]}}</td>
+        <td>{{form[1]}}</td>
+        <td>{{form[4]}}</td>
+        <td>
+          {%if form[4] == "pending"%}
+          <button onclick="openApprovalModal('{{ form[0] }}')">Approve</button>
+          {%endif%}
+        </td>
+      <td>
+        <img src="data:image/png;base64,{{form[6]}}" width="50">
+      </td>
+      </tr>
+      {%endif%}
+      {%endfor%}
+    </table>
+    <div id="approval-modal" class="modal">
+      <div class="modal-content">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <h2>Approve Form</h2>
+        <p>Upload your signature to approve the form.</p>
+        <input type="file" id="approver-signature" accept="image/*" name="approver-signature">
+        <canvas id="approver-signature-canvas" width="300" height="300"></canvas>
+        <button onclick="submitApproval()">Submit Approval</button>
+      </div>
     </div>
   </body>
 </html>

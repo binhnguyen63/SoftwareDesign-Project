@@ -20,12 +20,20 @@ CREATE TABLE IF NOT EXISTS users (
     email VARCHAR(255) PRIMARY KEY,
     name VARCHAR(255),
     role VARCHAR(255),
-    status BOOLEAN,
-    graduate_petition_form TEXT,
-    signature_graduate_petition_form BYTEA
+    account_status BOOLEAN
 );
 
-INSERT INTO users (email, name, role, status)
+CREATE TABLE IF NOT EXISTS forms (
+    form_id SERIAL PRIMARY KEY,
+    email VARCHAR(255),
+    form_name VARCHAR(255),
+    form_content TEXT,
+    status VARCHAR(255),
+    user_signature BYTEA,
+    approver_signature BYTEA
+);
+
+INSERT INTO users (email, name, role, account_status)
 VALUES 
     (LOWER('tbnguy36@CougarNet.UH.EDU'), 'Nguyen, Binh', 'admin', TRUE),
     (LOWER('fmmancil@cougarnet.uh.edu'), 'Mancilla, Fernando', 'admin', TRUE),
@@ -48,7 +56,7 @@ def get_user_by_email(email):
     if not email:
         return None
     """Retrieve a specific user from the database by email."""
-    g.db_cursor.execute("SELECT email, name, role, status FROM users WHERE email = %s", (email,))
+    g.db_cursor.execute("SELECT email, name, role, account_status FROM users WHERE email = %s", (email,))
     user = g.db_cursor.fetchone()
 
     if user:
@@ -56,7 +64,7 @@ def get_user_by_email(email):
             "email": user[0],
             "name": user[1],
             "role": user[2],
-            "status": user[3],
+            "account_status": user[3],
         }
     return None  # Return None if the user is not found
 
@@ -103,7 +111,7 @@ def add_user():
     email = data.get("email").lower()
     name = data.get("name")
     role = data.get("role", "basicUser")  # Default role if not provided
-    status = data.get("status", True)  # Default status to active (True) if not provided
+    account_status = data.get("account_status", True)  # Default status to active (True) if not provided
 
     # Check if the user already exists in the database
     g.db_cursor.execute("SELECT * FROM users WHERE email = %s", (email,))
@@ -117,8 +125,8 @@ def add_user():
     # If the user doesn't exist or is active, insert or do nothing
     if not user:
         g.db_cursor.execute(
-            "INSERT INTO users (email, name, role, status) VALUES (%s, %s, %s, %s) ON CONFLICT (email) DO NOTHING",
-            (email, name, role, status),
+            "INSERT INTO users (email, name, role, account_status) VALUES (%s, %s, %s, %s) ON CONFLICT (email) DO NOTHING",
+            (email, name, role, account_status),
         )
         g.db_conn.commit()
 
@@ -136,15 +144,15 @@ def update_user():
         email = user_data.get("email").lower()
         new_name = user_data.get("name")
         new_role = user_data.get("role")
-        new_status = user_data.get("status")
-        if user_data.get("status") == "True":
+        new_status = user_data.get("account_status")
+        if user_data.get("account_status") == "True":
             new_status = True
         else:
             new_status = False
         # Prepare the SQL query to update the user information
         query = """
             UPDATE users 
-            SET name = %s, role = %s, status = %s 
+            SET name = %s, role = %s, account_status = %s 
             WHERE email = %s
         """
         g.db_cursor.execute(query, (new_name, new_role, new_status, email))
@@ -235,7 +243,16 @@ def admin_dash():
     g.db_cursor.execute("SELECT * FROM users")
     users = g.db_cursor.fetchall()
     print("users: ", users)
-    return render_template("admin.html",users=users)
+
+    g.db_cursor.execute("SELECT * FROM forms")
+    forms = g.db_cursor.fetchall()
+    print("forms: ",forms)
+    approver_signature_binary = forms[0][6]
+    forms_list = list(forms[0])  # Convert the first tuple to a list
+    forms_list[6] = base64.b64encode(approver_signature_binary).decode('utf-8')  # Modify the list
+    forms = [(forms_list)]  # Convert it back to a tuple if needed
+    
+    return render_template("admin.html",users=users,forms=forms)
 
 @app.route("/reactivate", methods=["POST"])
 def reactivate_account():
@@ -248,7 +265,7 @@ def reactivate_account():
             return jsonify({"success": False, "message": "No email provided"}), 400
         
         # Reactivate the user's account (update the database)
-        g.db_cursor.execute("UPDATE users SET status = %s WHERE email = %s", (True, email))  # Assuming True means active
+        g.db_cursor.execute("UPDATE users SET account_status = %s WHERE email = %s", (True, email))  # Assuming True means active
         g.db_cursor.connection.commit()  # Commit the changes to the database
         
         return jsonify({"success": True, "message": "Account reactivated successfully"})
@@ -267,6 +284,44 @@ def handleGraduateStudentPetitionForm():
 
 # @app.route('/user-forms')
 # def user_forms():
+
+@app.route('/approve-form', methods=['POST'])
+def approve_form():
+    try:
+        print("approve formmmm")
+        user = session.get("user")
+        if not user or "email" not in user:
+            print("yes")
+            return jsonify({"error": "User not authenticated"}), 401
+        print("data approve form got 0")
+        data = request.get_json()
+        print("data approve form got")
+        formId = data.get("formId")
+        print("form id",formId)
+        approverSignatureBase64 = data.get("approverSignatureBase64")
+        status = data.get("account_status")
+        approver_signature_binary = None
+        if approverSignatureBase64:
+            try:
+                approver_signature_binary = base64.b64decode(approverSignatureBase64.split(",")[1])
+            except (IndexError, ValueError):
+                return jsonify({"error": "Invalid signature format"}), 400
+
+        print("hereeee")
+        query = """
+        UPDATE forms
+        SET status = %s, approver_signature = %s
+        WHERE form_id = %s;
+        """
+        data = (status,approver_signature_binary,formId)
+        print("databaseee")
+        g.db_cursor.execute(query,data)
+        g.db_conn.commit()
+        print("databaseee done")
+        return jsonify({"message": "approved form"})
+
+    except Exception as e:
+        return jsonify({"Error message": "Error approved form"})
     
 
 @app.route('/update-latex', methods=['POST'])
@@ -294,14 +349,22 @@ def update_latex():
         # Update both columns
 
         query = '''
-            UPDATE users 
-            SET graduate_petition_form = %s, signature_graduate_petition_form = %s 
-            WHERE email = %s
+        INSERT INTO forms (email, form_name, form_content, status, user_signature, approver_signature)
+        VALUES (%s, %s, %s, %s, %s, %s)
+        ON CONFLICT (form_id) 
+        DO UPDATE SET 
+            form_content = EXCLUDED.form_content,
+            user_signature = EXCLUDED.user_signature;
+
         '''
         print("here 1")
         print(user["email"].lower().strip())
-        g.db_cursor.execute(query, (latex_content, psycopg2.Binary(signature_binary) 
-        if signature_binary else None, user["email"].lower()))
+        user_email = user["email"].lower().strip()
+        form_name = "graduate student petition form"
+        status = "pending"
+        approver_signature = None
+        data = (user_email, form_name, latex_content, status, signature_binary,approver_signature)
+        g.db_cursor.execute(query, data)
 
         g.db_conn.commit()
         print("here 2")
@@ -330,18 +393,19 @@ def update_latex():
 def show_pdf():
     data = request.get_json()
 
-    if not data or "userEmail" not in data:
+    if not data or "formId" not in data:
         return jsonify({"error": "Missing LaTeX content"}), 400
 
+    formId = data["formId"]
     userEmail = data["userEmail"]
-    print("got user email: ", userEmail)
+    print("got user email: ", formId)
 
     query_latex = """
-    SELECT graduate_petition_form, signature_graduate_petition_form
-    FROM users
-    WHERE email = %s
+    SELECT form_content, user_signature
+    FROM forms
+    WHERE form_id = %s
     """
-    g.db_cursor.execute(query_latex, (userEmail,))
+    g.db_cursor.execute(query_latex, (formId,))
     result = g.db_cursor.fetchone()
 
     if not result or not result[0]:
