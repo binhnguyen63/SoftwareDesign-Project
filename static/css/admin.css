@@ -1,7 +1,6 @@
 /* General Styles */
 body {
   font-family: "Source Sans Pro", sans-serif;
-  /*font-family: Arial, sans-serif;*/
   background-color: #f4f4f4;
   margin: 0;
   padding: 0;
@@ -10,11 +9,11 @@ body {
 /* Navigation Bar */
 nav {
   overflow: hidden;
-  /*padding: 10px;*/
+  
+  background-color: #cb142c;
 }
 
 .nav-button {
-  background-color: #cb142c;
   color: #f2f2f2;
   text-align: center;
   padding: 14px 16px;
@@ -22,8 +21,8 @@ nav {
   border: none;
   cursor: pointer;
   transition: background-color 0.3s ease;
-  text-decoration: none; /* Remove underline from links */
-  display: inline-block; /* Ensure padding and margins work correctly */
+  text-decoration: none;
+  display: inline-block;
 }
 
 .nav-button:hover {
@@ -31,21 +30,34 @@ nav {
   color: white;
 }
 
-nav button {
-  float: left;
+/* Action Buttons */
+.action-buttons {
+  margin: 20px 0;
+  
+}
+
+.action-buttons button {
   background-color: #cb142c;
   color: #f2f2f2;
-  text-align: center;
-  padding: 14px 16px;
-  font-size: 17px;
+  padding: 10px 20px;
   border: none;
   cursor: pointer;
   transition: background-color 0.3s ease;
+  margin: 5px;
 }
 
-nav button:hover {
+.alterbtn{
+  background-color: #cb142c;
+  color: #f2f2f2;
+  padding: 10px 20px;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin: 5px;
+}
+
+.action-buttons button:hover {
   background-color: #860f1e;
-  color: white;
 }
 
 /* Tables */
@@ -54,7 +66,7 @@ table {
   border-collapse: collapse;
   width: 100%;
   max-width: 100%;
-  margin: 20px 5px 5px 5px;
+  margin: 20px 0;
   background-color: white;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
@@ -67,7 +79,7 @@ td {
 }
 
 tr:nth-child(even) {
-  background-color: #f2f2f2; /* Light gray background for even rows */
+  background-color: #f2f2f2;
 }
 
 th {
