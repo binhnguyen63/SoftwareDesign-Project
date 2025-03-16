@@ -11,10 +11,12 @@
     <script src="{{ url_for('static', filename='js/admin.js')}}" defer></script>
   </head>
   <body>
-    <button id="create-btn" onclick="addRow()">Create</button>
-    <button id="confirm-create-btn" onclick="confirmAddRow()">Confirm Create</button>
-    <button id="update" onclick="enableEditing()">Update</button>
-    <button id="confirm-update" onclick="confirmUpdate()">Confirm Update</button>
+    <nav>
+      <button id="create-btn" onclick="addRow()">Create</button>
+      <button id="confirm-create-btn" onclick="confirmAddRow()">Confirm Create</button>
+      <button id="update" onclick="enableEditing()">Update</button>
+      <button id="confirm-update" onclick="confirmUpdate()">Confirm Update</button>
+    </nav>
     <table id="userTable">
       <tr>
         <th>Email</th>
