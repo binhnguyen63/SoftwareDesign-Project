@@ -67,7 +67,7 @@
   </head>
   <body>
     <div class="container">
-      {% if user %} {% if user.status %}
+      {% if user %} {% if user.account_status %}
       <h2>Welcome, {{ user.name }}!</h2>
       <p>Email: {{ user.email }}</p>
       {% if user.role.lower() == 'admin' %}
