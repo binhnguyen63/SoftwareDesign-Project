@@ -247,10 +247,12 @@ def admin_dash():
     g.db_cursor.execute("SELECT * FROM forms")
     forms = g.db_cursor.fetchall()
     print("forms: ",forms)
-    approver_signature_binary = forms[0][6]
-    forms_list = list(forms[0])  # Convert the first tuple to a list
-    forms_list[6] = base64.b64encode(approver_signature_binary).decode('utf-8')  # Modify the list
-    forms = [(forms_list)]  # Convert it back to a tuple if needed
+    approver_signature_binary = None
+    if (forms):
+        approver_signature_binary = forms[0][6]
+        forms_list = list(forms[0])  # Convert the first tuple to a list
+        forms_list[6] = base64.b64encode(approver_signature_binary).decode('utf-8')  # Modify the list
+        forms = [(forms_list)]  # Convert it back to a tuple if needed
     
     return render_template("admin.html",users=users,forms=forms)
 
