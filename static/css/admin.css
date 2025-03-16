@@ -13,6 +13,24 @@ nav {
   /*padding: 10px;*/
 }
 
+.nav-button {
+  background-color: #cb142c;
+  color: #f2f2f2;
+  text-align: center;
+  padding: 14px 16px;
+  font-size: 17px;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  text-decoration: none; /* Remove underline from links */
+  display: inline-block; /* Ensure padding and margins work correctly */
+}
+
+.nav-button:hover {
+  background-color: #860f1e;
+  color: white;
+}
+
 nav button {
   float: left;
   background-color: #cb142c;
