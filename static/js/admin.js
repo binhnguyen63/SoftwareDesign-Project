@@ -21,8 +21,8 @@ function addRow() {
   let statusCell = row.insertCell(3);
   statusCell.innerHTML = `
   <select>
-      <option value="True" selected>True</option>
-      <option value="False">False</option>
+      <option value="True" selected>Active</option>
+      <option value="False">Deactivated</option>
   </select>
   `;
   let deleteCell = row.insertCell(4);
