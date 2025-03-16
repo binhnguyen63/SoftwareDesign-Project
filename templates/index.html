@@ -15,7 +15,7 @@
     <nav>
       <div>
         <a href="{{ url_for('index') }}" class="logo">Home</a>
-        {%if user[2] == "admin"}
+        {%if user.role == "admin"%}
         <a href="{{ url_for('admin_dash') }}">Admin Dashboard</a>
         {%endif%}
       </div>
