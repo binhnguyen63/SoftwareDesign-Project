@@ -14,6 +14,7 @@ nav {
 
 nav button {
   float: left;
+  background-color: #cb142c;
   color: #f2f2f2;
   text-align: center;
   padding: 14px 16px;
@@ -24,7 +25,7 @@ nav button {
 }
 
 nav button:hover {
-  background-color: #cb142c;
+  background-color: #860f1e;
   color: white;
 }
 
