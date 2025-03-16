@@ -223,8 +223,9 @@ def index():
     userinfo = None
     if user:
         userinfo = get_user_by_email(user['email'])
-    print(userinfo)
-    return render_template("index.html", user=userinfo)
+    g.db_cursor.execute("SELECT * FROM forms")
+    forms = g.db_cursor.fetchall()
+    return render_template("index.html", user=userinfo,forms = forms)
 
 # Logout
 @app.route("/logout")
@@ -378,21 +379,21 @@ def update_latex():
 
         g.db_conn.commit()
         print("here 2")
-        query = """
-            SELECT *
-            FROM users
-            WHERE email = %s
-        """
-        g.db_cursor.execute(query, (user["email"].lower().strip(),))
-        updated_row = g.db_cursor.fetchone()
-        updated_row_list = list(updated_row)  # Convert tuple to list for modification
-        if isinstance(updated_row_list[5], memoryview):  # Assuming signature is at index 5
-            updated_row_list[5] = bytes(updated_row_list[5])  # Convert to bytes
-        print("updated row: ", updated_row_list[4])
+        # query = """
+        #     SELECT *
+        #     FROM users
+        #     WHERE email = %s
+        # """
+        # g.db_cursor.execute(query, (user["email"].lower().strip(),))
         # updated_row = g.db_cursor.fetchone()
-        if not updated_row:
+        # updated_row_list = list(updated_row)  # Convert tuple to list for modification
+        # if isinstance(updated_row_list[5], memoryview):  # Assuming signature is at index 5
+        #     updated_row_list[5] = bytes(updated_row_list[5])  # Convert to bytes
+        # print("updated row: ", updated_row_list[4])
+        # # updated_row = g.db_cursor.fetchone()
+        # if not updated_row:
                 
-            return jsonify({"error": "No row updated. User may not exist"}), 404
+        #     return jsonify({"error": "No row updated. User may not exist"}), 404
 
         return jsonify({"message": "LaTeX and signature updated"})
 

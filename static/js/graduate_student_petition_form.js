@@ -270,7 +270,7 @@ document
 
       if (response.ok) {
         const result = await response.json();
-        console.log("File saved:", result.filePath);
+        alert("Successfully submitted form");
       } else {
         console.error("Error saving file");
       }

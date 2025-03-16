@@ -11,6 +11,7 @@ body {
   padding: 30px;
   border-radius: 8px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  margin-top: 3rem;
 }
 
 .header {
@@ -168,4 +169,28 @@ textarea {
   width: 100%;
   margin-top: 10px;
   padding: 8px;
+}
+/* Navigation Bar */
+nav {
+  background-color: #cb142c;
+  color: white;
+  padding: 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+nav a {
+  color: white;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.btn {
+  background-color: white;
+  color: #160204 !important;
+  padding: 10px 15px;
+  border-radius: 5px;
+  text-decoration: none;
+  font-weight: bold;
 }

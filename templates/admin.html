@@ -11,82 +11,87 @@
     <script src="{{ url_for('static', filename='js/admin.js')}}" defer></script>
   </head>
   <body>
-    <nav>
-      <button id="create-btn" onclick="addRow()">Create</button>
-      <button id="confirm-create-btn" onclick="confirmAddRow()">Confirm Create</button>
-      <button id="update" onclick="enableEditing()">Update</button>
-      <button id="confirm-update" onclick="confirmUpdate()">Confirm Update</button>
-      <a href="index.html" class="nav-button">Home</a>
-      <a href="graduate_student_petition_form.html" class="nav-button">Petition Form</a>
-    </nav>
     <div>
-    <table id="userTable" class="table">
-      <tr>
-        <th>Email</th>
-        <th>Name</th>
-        <th>Role</th>
-        <th>Account Status</th>
-        <th>Action</th>
-      </tr>
-      {% for user in users %}
-      <tr>
-        <td contenteditable="false">{{ user[0] }}</td>
-        <td contenteditable="false">{{ user[1] }}</td>
-        <td>
-          <select disabled>
-            <option value="admin" {% if user[2] == 'admin' %}selected{% endif %}>Admin</option>
-            <option value="basicUser" {% if user[2] == 'basicUser' %}selected{% endif %}>basicUser</option>
-            <option value="vipUser" {% if user[2] == 'vipUser' %}selected{% endif %}>vipUser</option>
-          </select>
-        </td>
-        <td>
+      <nav>
+        <a href="{{ url_for('index') }}" class="nav-button">Home</a>
+        <a href="graduate_student_petition_form.html" class="nav-button">Petition Form</a>
+      </nav>
+    </div>
+    <div class="action-buttons">
+      <button class="alterbtn" id="create-btn" onclick="addRow()">Create</button>
+      <button class="alterbtn" id="confirm-create-btn" onclick="confirmAddRow()">Confirm Create</button>
+      <button class="alterbtn" id="update" onclick="enableEditing()">Update</button>
+      <button class="alterbtn" id="confirm-update" onclick="confirmUpdate()">Confirm Update</button>
+    </div>
+
+    <div>
+      <table id="userTable" class="table">
+        <tr>
+          <th>Email</th>
+          <th>Name</th>
+          <th>Role</th>
+          <th>Account Status</th>
+          <th>Action</th>
+        </tr>
+        {% for user in users %}
+        <tr>
+          <td contenteditable="false">{{ user[0] }}</td>
+          <td contenteditable="false">{{ user[1] }}</td>
+          <td>
             <select disabled>
-                <option value="True" {% if user[3]%}selected{%endif%}>Active</option>
-                <option value="False" {% if not user[3]%}selected{%endif%}>Deactivated</option>
+              <option value="admin" {% if user[2] == 'admin' %}selected{% endif %}>Admin</option>
+              <option value="basicUser" {% if user[2] == 'basicUser' %}selected{% endif %}>basicUser</option>
+              <option value="vipUser" {% if user[2] == 'vipUser' %}selected{% endif %}>vipUser</option>
             </select>
-        </td>
-        <td>
-            {%if user[2].lower() != 'admin'%}
-            <button class = "btn btn-primary" onclick="deleteRow(this, '{{ user[0] }}')">Delete</button>
-
-            {%endif%}
-        </td>
-
-      </tr>
-      {% endfor %}
-    </table>
+          </td>
+          <td>
+              <select disabled>
+                  <option value="True" {% if user[3]%}selected{%endif%}>Active</option>
+                  <option value="False" {% if not user[3]%}selected{%endif%}>Deactivated</option>
+              </select>
+          </td>
+          <td>
+              {%if user[2].lower() != 'admin'%}
+              <button class = "btn btn-primary" onclick="deleteRow(this, '{{ user[0] }}')">Delete</button>
+              {%endif%}
+          </td>
+        </tr>
+        {% endfor %}
+      </table>
     </div>
+
     <div>
-    <table id="submitted-forms">
-      <tr>
-        <th>Form Id</th>
-        <th>Form</th>
-        <th>Email</th>
-        <th>Status</th>
-        <th>Action</th>
-        <th>Admin Approval Signature </th>
-      </tr>
-      {%for form in forms%}
-      {%if form[2]%}
-      <tr>
-        <td>{{form[0]}}</td>
-        <td onclick="viewForm('{{form[0]}}','{{form[1]}}')" id="form-name">{{form[2]}}</td>
-        <td>{{form[1]}}</td>
-        <td>{{form[4]}}</td>
-        <td>
-          {%if form[4] == "pending"%}
-          <button onclick="openApprovalModal('{{ form[0] }}')">Approve</button>
-          {%endif%}
-          <button>Request more  Info</button>
-        </td>
-      <td>
-        <img src="data:image/png;base64,{{form[6]}}" width="50">
-      </td>
-      </tr>
-      {%endif%}
-      {%endfor%}
-    </table>
+      <table id="submitted-forms">
+        <tr>
+          <th>Form Id</th>
+          <th>Form</th>
+          <th>Email</th>
+          <th>Status</th>
+          <th>Action</th>
+          <th>Admin Approval Signature </th>
+        </tr>
+        {%for form in forms%}
+        {%if form[2]%}
+        <tr>
+          <td>{{form[0]}}</td>
+          <td onclick="viewForm('{{form[0]}}','{{form[1]}}')" id="form-name">{{form[2]}}</td>
+          <td>{{form[1]}}</td>
+          <td>{{form[4]}}</td>
+          <td>
+            {%if form[4] == "pending"%}
+            <button onclick="openApprovalModal('{{ form[0] }}')">Approve</button>
+            {%endif%}
+            <button>Request more  Info</button>
+          </td>
+          <td>
+            <img src="data:image/png;base64,{{form[6]}}" width="50">
+          </td>
+        </tr>
+        {%endif%}
+        {%endfor%}
+      </table>
     </div>
+
     <div id="approval-modal" class="modal">
       <div class="modal-content">
         <span class="close" onclick="closeModal()">&times;</span>

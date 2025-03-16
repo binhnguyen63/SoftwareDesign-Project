@@ -14,6 +14,12 @@
     ></script>
   </head>
   <body>
+    {%if userName%}
+    <nav>
+      <a href="{{ url_for('index') }}" class="logo">Home</a>
+      <span>Welcome, {{ userName[0] }}, {{userName[1]}}</span>
+      <a href="{{ url_for('logout') }}" class="btn">Logout</a>
+    </nav>
     <div class="container">
       <div class="header">
         <h1>UNIVERSITY of HOUSTON</h1>
@@ -386,5 +392,6 @@
         <button type="submit">Submit</button>
       </form>
     </div>
+    {%endif%}
   </body>
 </html>

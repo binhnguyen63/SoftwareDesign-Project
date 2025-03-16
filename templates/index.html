@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>User Authentication</title>
+    <title>User Dashboard</title>
     <link
       rel="stylesheet"
       href="{{ url_for('static', filename='css/index.css') }}"
@@ -11,44 +11,54 @@
     <script src="{{ url_for('static', filename='js/index.js')}}" defer></script>
   </head>
   <body>
-    <div class="container">
-      {% if user %} {% if user.account_status %}
-      <h2>Welcome, {{ user.name }}!</h2>
-      <p>Email: {{ user.email }}</p>
-      {% if user.role.lower() == 'admin' %}
+    {% if user %} {% if user.account_status %}
+    <nav>
       <div>
-        <a href="{{ url_for('admin_dash') }}">Go To Admin DashBoard</a>
+        <a href="{{ url_for('index') }}" class="logo">Home</a>
+        <a href="{{ url_for('admin_dash') }}">Admin Dashboard</a>
       </div>
-      {% endif %}
-      <div>
-        <a href="{{ url_for('handleGraduateStudentPetitionForm') }}"">Graduate/Professional Student Petition Form</a>
-      </div>
-       {% else %}
-      <h2>
-        Your account is deactivated. Do you want to reactivate your account?
-      </h2>
-      <div>
-        <a>
-          <button class="reactivate-btn" onclick="reactivateAccount()">
-            Reactivate please
-          </button>
-        </a>
+      <span>Welcome, {{ user.name }}</span>
+      <a href="{{ url_for('logout') }}" class="btn">Logout</a>
+    </nav>
 
-        <a href="{{ url_for('logout') }}">
-          <button class="refuse-reactivate-btn""">
-            Don't reactivate and log out
-          </button>
-        </a>
+    <div class="dashboard-container">
+      <aside class="form-list">
+        <h3>Online Forms</h3>
+        <ul>
+          <li>Graduate Student Petition Form</li>
+        </ul>
+      </aside>
 
-      </div>
-
-      {% endif %}
-      <a class="btn" href="{{ url_for('logout') }}">Log Out</a>
-      {% else %}
-      <h2>Welcome to the User Management System</h2>
-      <p>Please log in with your Office365 account.</p>
-      <a class="btn" href="{{ url_for('login') }}">Log In</a>
-      {% endif %}
+      <section class="form-details">
+        <h3>Graduate Student Petition Form</h3>
+        <p>
+          -
+          <a href="{{ url_for('handleGraduateStudentPetitionForm') }}"
+            >Fill out Form</a
+          >
+        </p>
+        <p>- <a>View submitted Form</a></p>
+      </section>
     </div>
+    {% else %}
+    <div class="inactive-box">
+      <h2>Your account is deactivated.</h2>
+      <p>Would you like to reactivate it?</p>
+      <button class="btn-primary" onclick="reactivateAccount()">
+        Reactivate
+      </button>
+      <a href="{{ url_for('logout') }}" class="btn-secondary"
+        >Don't Reactivate & Logout</a
+      >
+    </div>
+    {% endif %} {% else %}
+    <div class="login-container">
+      <div class="login">
+        <h2>Welcome to our website</h2>
+        <p>Please log in with your Office365 account.</p>
+        <a class="btn" href="{{ url_for('login') }}">Log In</a>
+      </div>
+    </div>
+    {% endif %}
   </body>
 </html>
