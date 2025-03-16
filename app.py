@@ -30,7 +30,8 @@ CREATE TABLE IF NOT EXISTS forms (
     form_content TEXT,
     status VARCHAR(255),
     user_signature BYTEA,
-    approver_signature BYTEA
+    approver_signature BYTEA,
+    CONSTRAINT unique_email_form_name UNIQUE (email, form_name)
 );
 
 INSERT INTO users (email, name, role, account_status)
@@ -362,11 +363,10 @@ def update_latex():
         query = '''
         INSERT INTO forms (email, form_name, form_content, status, user_signature, approver_signature)
         VALUES (%s, %s, %s, %s, %s, %s)
-        ON CONFLICT (form_id) 
+        ON CONFLICT (email, form_name) 
         DO UPDATE SET 
             form_content = EXCLUDED.form_content,
             user_signature = EXCLUDED.user_signature;
-
         '''
         print("here 1")
         print(user["email"].lower().strip())
