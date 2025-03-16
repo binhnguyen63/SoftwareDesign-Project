@@ -1,6 +1,6 @@
 /* General Styles */
 body {
-  font-family: 'Source Sans Pro', sans-serif;
+  font-family: "Source Sans Pro", sans-serif;
   /*font-family: Arial, sans-serif;*/
   background-color: #f4f4f4;
   margin: 0;
@@ -59,7 +59,8 @@ table {
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
-th, td {
+th,
+td {
   border: 1px solid black;
   padding: 12px;
   text-align: left;
@@ -68,7 +69,6 @@ th, td {
 tr:nth-child(even) {
   background-color: #f2f2f2; /* Light gray background for even rows */
 }
-
 
 th {
   background-color: #f2f2f2;
@@ -79,7 +79,7 @@ tr:hover {
   background-color: #f9f9f9;
 }
 
-select{
+select {
   width: 100%;
   padding: 8px;
   border: 1px solid #ccc;
@@ -174,7 +174,16 @@ select:disabled {
     padding: 10px 12px;
   }
 
-  th, td {
+  th,
+  td {
     padding: 8px;
   }
+}
+
+#confirm-create-btn {
+  display: none;
+}
+
+#confirm-update {
+  display: none;
 }
