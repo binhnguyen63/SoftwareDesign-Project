@@ -247,12 +247,21 @@ def admin_dash():
     g.db_cursor.execute("SELECT * FROM forms")
     forms = g.db_cursor.fetchall()
     print("forms: ",forms)
-    approver_signature_binary = forms[0][6]
-    if (forms and approver_signature_binary):
-        forms_list = list(forms[0])  # Convert the first tuple to a list
-        forms_list[6] = base64.b64encode(approver_signature_binary).decode('utf-8')  # Modify the list
-        forms = [(forms_list)]  # Convert it back to a tuple if needed
-    
+    print("forms len", len(forms))
+    approver_signature_binary = None
+    if (forms):
+        updated_forms = []
+        for form in forms:
+            forms_list = form
+            if form[6]:
+                approver_signature_binary = form[6]
+                forms_list = list(form)  # Convert the first tuple to a list
+                forms_list[6] = base64.b64encode(approver_signature_binary).decode('utf-8')
+                print("binary img generated: ",forms_list[6])  # Modify the list
+            updated_forms.append(tuple(forms_list))
+                  # Convert it back to a tuple if needed
+        forms = updated_forms
+    print("forms: ",forms)
     return render_template("admin.html",users=users,forms=forms)
 
 @app.route("/reactivate", methods=["POST"])
@@ -300,7 +309,7 @@ def approve_form():
         formId = data.get("formId")
         print("form id",formId)
         approverSignatureBase64 = data.get("approverSignatureBase64")
-        status = data.get("account_status")
+        status = data.get("status")
         approver_signature_binary = None
         if approverSignatureBase64:
             try:
