@@ -1,70 +1,90 @@
-table {
-  border: 2px solid black;
-  border-collapse: collapse; /* Ensures borders don't double up */
-  width: 100%;
+/* General Styles */
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f4f4f4;
+  margin: 0;
+  padding: 0;
 }
 
+/* Navigation Bar */
 nav {
   overflow: hidden;
   background-color: #333;
+  padding: 10px;
 }
 
-nav button{
+nav button {
   float: left;
   color: #f2f2f2;
   text-align: center;
   padding: 14px 16px;
   font-size: 17px;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
 }
 
-nav button:hover{
+nav button:hover {
   background-color: #cb142c;
-  color: black;
+  color: white;
+}
+
+/* Tables */
+table {
+  border: 2px solid black;
+  border-collapse: collapse;
+  width: 100%;
+  margin-top: 20px;
+  background-color: white;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
 th, td {
   border: 1px solid black;
-  padding: 8px;
+  padding: 12px;
   text-align: left;
 }
 
 th {
-  background-color: #f2f2f2; /* Light gray header */
+  background-color: #f2f2f2;
+  font-weight: bold;
 }
 
-.btn-primary{
+tr:hover {
+  background-color: #f9f9f9;
+}
+
+/* Buttons */
+.btn-primary {
   color: #ffffff;
   background-color: #c8102e;
   border-color: #960c22;
+  padding: 8px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
 }
 
-.btn{
+.btn-primary:hover {
+  background-color: #960c22;
+}
+
+.btn {
   border-width: 1px 1px 3px 1px;
   font-family: 'Source Sans Pro', sans-serif;
   text-shadow: none;
 }
 
-#confirm-update {
-  display: none;
-}
-#confirm-create-btn {
-  display: none;
-}
-
-#form-name:hover {
-  color: blue;
-  cursor: pointer;
-}
-
+/* Modal */
 .modal {
-  display: none; /* Hidden by default */
+  display: none;
   position: fixed;
-  z-index: 1;
+  z-index: 1000;
   left: 0;
   top: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.4);
+  background-color: rgba(0, 0, 0, 0.5);
 }
 
 .modal-content {
@@ -74,6 +94,8 @@ th {
   border: 1px solid #888;
   width: 40%;
   text-align: center;
+  border-radius: 8px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
 }
 
 .close {
@@ -81,8 +103,39 @@ th {
   font-size: 28px;
   font-weight: bold;
   cursor: pointer;
+  color: #888;
 }
 
 .close:hover {
   color: red;
+}
+
+/* Form Name Hover Effect */
+#form-name:hover {
+  color: blue;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+/* Signature Canvas */
+#approver-signature-canvas {
+  border: 1px solid #ccc;
+  margin-top: 10px;
+  background-color: #f9f9f9;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .modal-content {
+    width: 80%;
+  }
+
+  nav button {
+    font-size: 14px;
+    padding: 10px 12px;
+  }
+
+  th, td {
+    padding: 8px;
+  }
 }
