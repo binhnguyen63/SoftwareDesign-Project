@@ -27,18 +27,31 @@
       <aside class="form-list">
         <h3>Online Forms</h3>
         <ul>
-          <li>Graduate Student Petition Form</li>
+          <li id="graduate-petition-form">Graduate Student Petition Form</li>
+          <li id="undergraduate-transfer-form">Undergraduate Tranfer Form</li>
         </ul>
       </aside>
 
       <section class="form-details">
-        <h3>Graduate Student Petition Form</h3>
-        <p>
-          -
-          <a href="{{ url_for('handleGraduateStudentPetitionForm') }}"
-            >Fill out Form</a
-          >
-        </p>
+        <div id="graduate-petition-form-container" class="hidden">
+          <h3>Graduate Student Petition Form</h3>
+          <p>
+            -
+            <a href="{{ url_for('handleGraduateStudentPetitionForm') }}"
+              >Fill out Form</a
+            >
+          </p>
+        </div>
+        <div id="undergraduate-transfer-form-container">
+          <h3>Undergraduate Transfer Form</h3>
+          <p>
+            -
+            <a href="{{ url_for('undergraduateTransferForm') }}"
+              >Fill out Form</a
+            >
+          </p>
+        </div>
+
         <p>- <a>View submitted Form</a></p>
       </section>
     </div>

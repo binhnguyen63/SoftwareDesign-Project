@@ -294,6 +294,11 @@ def handleGraduateStudentPetitionForm():
     print(userName)
     return render_template("forms/graduate_student_petition_form.html",userName=userName)
 
+@app.route("/undergraduate-transfer-form")
+def undergraduateTransferForm():
+    user = session.get("user")
+    userName = user['name'].split(',')
+    return render_template("forms/undergraduate_transfer_form.html",userName=userName)
 # @app.route('/user-forms')
 # def user_forms():
 

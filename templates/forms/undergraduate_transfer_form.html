@@ -12,7 +12,7 @@
 <body>
     {%if userName%}
     <nav>
-        <a href="{{ url_for('home') }}" class="logo">Home</a>
+        <a href="{{ url_for('index') }}" class="logo">Home</a>
         <span>Welcome, {{ userName[0] }}, {{userName[1]}}</span>
         <a href="{{ url_for('logout') }}" class="btn">Logout</a>
     </nav>
@@ -314,6 +314,22 @@
                     </div>
                 </div>
             </div>
+
+                    <!-- Signature Section -->
+        <div class="form-section signature-section">
+            <div class="form-row">
+              <div class="form-group">
+                <label for="signature">Student Signature</label>
+                <input
+                  type="file"
+                  id="signature"
+                  name="signature"
+                  accept="image/*"
+                />
+                <canvas id="signatureCanvas" width="300" height="100"></canvas>
+              </div>
+            </div>
+          </div>
 
             <button type="submit">Submit</button>
 

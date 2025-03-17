@@ -88,3 +88,17 @@ nav a {
 .logo {
   margin-right: 2rem;
 }
+
+.hidden {
+  display: none;
+}
+
+#graduate-petition-form,
+#undergraduate-transfer-form {
+  cursor: pointer;
+}
+
+#graduate-petition-form:hover,
+#undergraduate-transfer-form:hover {
+  color: red;
+}
