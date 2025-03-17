@@ -226,6 +226,11 @@ def index():
         userinfo = get_user_by_email(user['email'])
     g.db_cursor.execute("SELECT * FROM forms")
     forms = g.db_cursor.fetchall()
+    print("forms: ",forms)
+    for form in forms:
+        if form[2] == "graduate student petition form":
+            print('helloo yes')
+        print(form[2])
     return render_template("index.html", user=userinfo,forms = forms)
 
 # Logout

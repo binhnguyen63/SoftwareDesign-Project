@@ -46,3 +46,21 @@ document
       .getElementById("undergraduate-transfer-form-container")
       .classList.remove("hidden");
   });
+1;
+function viewForm(formId, userEmail) {
+  event.preventDefault();
+  console.log("fetching user pdf: ", userEmail);
+  fetch("/show_pdf", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ formId, userEmail }),
+  })
+    .then((response) => response.blob())
+    .then((blob) => {
+      const url = URL.createObjectURL(blob);
+      window.open(url); // Opens the PDF in a new tab
+    })
+    .catch((error) => {
+      console.log("Error: ", error);
+    });
+}

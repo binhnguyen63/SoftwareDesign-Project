@@ -41,6 +41,11 @@
               >Fill out Form</a
             >
           </p>
+          <p>
+            - <span>Form Status:</span> {% for form in forms %} {% if form[2] ==
+            "graduate student petition form" %} {{form[4]}} {%else%} Not
+            submitted {% endif %} {% endfor %}
+          </p>
         </div>
         <div id="undergraduate-transfer-form-container">
           <h3>Undergraduate Transfer Form</h3>
@@ -50,9 +55,12 @@
               >Fill out Form</a
             >
           </p>
+          <p>
+            - <span>Form Status:</span> {% for form in forms %} {% if form[2] ==
+            "undergraduate transfer form" %} {{form[4]}} {%else%} Not submitted
+            {% endif %} {% endfor %}
+          </p>
         </div>
-
-        <p>- <a>View submitted Form</a></p>
       </section>
     </div>
     {% else %}
