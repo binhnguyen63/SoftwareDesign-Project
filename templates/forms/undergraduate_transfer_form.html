@@ -153,15 +153,6 @@
                             </td>
                         </tr>
 
-                        <tr>
-                            <td colspan=1>
-                                <label for="uh_id">UH ID</label>
-                            </td>
-                            <td colspan=1>
-                                <input type="text" id="uh_id" name="uh_id" required />
-                            </td>
-
-                        </tr>
 
                         <tr>
                             <td colspan=2 style="text-align:right;">
@@ -248,72 +239,6 @@
                 </div>
             </div>
 
-            <!-- Attachments -->
-            <div class="container">
-                <div class="form-section">
-                    <div class="file-attachments">
-                        <label for="attachments">File Attachments</label>
-                        <table id="attachment-box">
-                            <tr>
-                                <th>
-                                    <label>Attachment Required</label>
-                                </th>
-                                <th>
-                                    <label>Action</label>
-                                </th>
-                                <th>
-                                    <label>Description</label>
-                                </th>
-                                <th>
-                                    <label>File Name</label>
-                                </th>
-                                <th>
-                                    <label>Delete</label>
-                                </th>
-                                <th>
-                                    <button onclick="addRowAttachmentBox()">Add</button>
-                                </th>
-                            </tr>
-                            <tr id="attachment-information">
-                                <!-- Attachment Required -->
-                                <td>
-                                    <span class="exclamation-mark">❗️</span>
-                                </td>
-
-                                <!-- Action -->
-                                <td>
-                                    <input type="file" id="attachments" name="attachments" accept="image/*" />
-                                </td>
-
-                                <!-- Description -->
-                                <td>
-                                        <select id="file-description" name="file-description">
-                                        <option value="" selected>Select...</option>
-                                        <option value="optional_supplemental_document">Optional Supplemental Document</option>
-                                        <option value="petition_course_syllabus">Petition Course Syllabus</option>
-                                        <option value="petition_course_description">Petition Course Description</option>
-                                        <option value="transfer_credit_summary">Transfer Credit Summary</option>
-                                </td>
-
-                                <!-- File Name -->
-                                <td>
-                                    
-                                </td>
-
-                                <!-- Delete -->
-                                <td>
-                                    <button class="delete-btn" disabled>Delete</button>
-                                </td>
-
-                                <!-- Add Col -->
-                                <td>
-
-                                </td>
-                            </tr>
-                        </table>
-                    </div>
-                </div>
-            </div>
 
                     <!-- Signature Section -->
         <div class="form-section signature-section">
@@ -330,8 +255,8 @@
               </div>
             </div>
           </div>
-
-            <button type="submit">Submit</button>
+        <button id="fill-out">Fill our form automatically - testing only</button>
+        <button type="submit">Submit</button>
 
         </form>
         {%endif%}

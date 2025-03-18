@@ -33,7 +33,7 @@
       </aside>
 
       <section class="form-details">
-        <div id="graduate-petition-form-container" class="hidden">
+        <div id="graduate-petition-form-container">
           <h3>Graduate Student Petition Form</h3>
           <p>
             -
@@ -42,12 +42,13 @@
             >
           </p>
           <p>
-            - <span>Form Status:</span> {% for form in forms %} {% if form[2] ==
-            "graduate student petition form" %} {{form[4]}} {%else%} Not
-            submitted {% endif %} {% endfor %}
+            - <span>Form Status:</span>{% set status = false %} {% for form in
+            forms %} {% if form[2] == "graduate student petition form" and not
+            status %} {% set status = true %} {{ form[4] }} {% endif %} {%
+            endfor %}
           </p>
         </div>
-        <div id="undergraduate-transfer-form-container">
+        <div id="undergraduate-transfer-form-container" class="hidden">
           <h3>Undergraduate Transfer Form</h3>
           <p>
             -
@@ -56,9 +57,10 @@
             >
           </p>
           <p>
-            - <span>Form Status:</span> {% for form in forms %} {% if form[2] ==
-            "undergraduate transfer form" %} {{form[4]}} {%else%} Not submitted
-            {% endif %} {% endfor %}
+            - <span>Form Status:</span>{% set status = false %} {% for form in
+            forms %} {% if form[2] == "undergraduate transfer form" and not
+            status %} {% set status = true %} {{ form[4] }} {% endif %} {%
+            endfor %}
           </p>
         </div>
       </section>

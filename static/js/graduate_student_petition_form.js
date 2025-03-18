@@ -263,6 +263,7 @@ document
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          formName: "undergraduate transfer form",
           content: latexContent,
           signature: signatureBase64,
         }),

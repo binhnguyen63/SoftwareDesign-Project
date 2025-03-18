@@ -276,3 +276,24 @@ async function submitApproval() {
     console.error("Error:", error);
   }
 }
+
+async function requestMoreInfo(comment) {
+  try {
+    const response = await fetch("/undergraduate-transfer-form", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        returnedForm,
+      }),
+    });
+
+    if (response.ok) {
+      const result = await response.json();
+      alert("Successfully submitted form");
+    } else {
+      console.error("Error saving file");
+    }
+  } catch (error) {
+    console.error("Request failed", error);
+  }
+}

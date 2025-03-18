@@ -299,13 +299,24 @@ def handleGraduateStudentPetitionForm():
     print(userName)
     return render_template("forms/graduate_student_petition_form.html",userName=userName)
 
-@app.route("/undergraduate-transfer-form")
+@app.route("/undergraduate-transfer-form", methods=["GET", "POST"])
 def undergraduateTransferForm():
     user = session.get("user")
     userName = user['name'].split(',')
+    # Store object in the session
+    if request.method == "POST":
+        # user_name = request.form['userName']
+        # user_email = request.form['email']
+        
+        # # Store the object in session
+        # session['user'] = {'name': user_name, 'email': user_email}
+        print("method post run")
+        return render_template("forms/undergraduate_transfer_form.html", userName = userName)
     return render_template("forms/undergraduate_transfer_form.html",userName=userName)
 # @app.route('/user-forms')
 # def user_forms():
+
+
 
 @app.route('/approve-form', methods=['POST'])
 def approve_form():
@@ -356,6 +367,7 @@ def update_latex():
         data = request.get_json()
         latex_content = data.get("content")
         signature_base64 = data.get("signature")
+        form_name = data.get("formName")
 
         if latex_content is None:
             return jsonify({"error": "Missing LaTeX content"}), 400
@@ -381,7 +393,6 @@ def update_latex():
         print("here 1")
         print(user["email"].lower().strip())
         user_email = user["email"].lower().strip()
-        form_name = "graduate student petition form"
         status = "pending"
         approver_signature = None
         data = (user_email, form_name, latex_content, status, signature_binary,approver_signature)
