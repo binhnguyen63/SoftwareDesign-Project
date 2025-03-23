@@ -277,23 +277,37 @@ async function submitApproval() {
   }
 }
 
-async function requestMoreInfo(comment) {
+async function requestMoreInfo(returnedFormId, comment) {
   try {
-    const response = await fetch("/undergraduate-transfer-form", {
+    const response = await fetch("/return-form", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        returnedForm,
+        returnedFormId,
+        comment,
       }),
     });
 
     if (response.ok) {
       const result = await response.json();
-      alert("Successfully submitted form");
+      alert("Successfully return form to request more info");
+      location.reload();
     } else {
-      console.error("Error saving file");
+      console.error("Error return file to request more info");
     }
   } catch (error) {
-    console.error("Request failed", error);
+    console.error("Request failed - return file to request more info", error);
   }
 }
+
+document
+  .getElementById("request-info-btn")
+  .addEventListener("click", async (event) => {
+    console.log("request more info btn clicked");
+    const returnedFormId = event.target.classList[0];
+    console.log("returnedFormId: ", returnedFormId);
+    const comment = "need more info";
+
+    await requestMoreInfo(returnedFormId, comment);
+    document.getElementById("request-info-btn").disabled = true;
+  });

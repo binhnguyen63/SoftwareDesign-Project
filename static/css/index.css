@@ -99,6 +99,11 @@ nav a {
 }
 
 #graduate-petition-form:hover,
-#undergraduate-transfer-form:hover {
+#undergraduate-transfer-form:hover,
+.view-submitted-form-btn:hover {
   color: red;
+}
+
+.view-submitted-form-btn {
+  cursor: pointer;
 }

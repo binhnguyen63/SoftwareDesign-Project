@@ -31,6 +31,7 @@ CREATE TABLE IF NOT EXISTS forms (
     status VARCHAR(255),
     user_signature BYTEA,
     approver_signature BYTEA,
+    approver_comment VARCHAR(255),
     CONSTRAINT unique_email_form_name UNIQUE (email, form_name)
 );
 
@@ -70,6 +71,8 @@ def get_user_by_email(email):
     return None  # Return None if the user is not found
 
 
+
+
 @app.before_request
 def before_request():
     """Create a database connection before each request."""
@@ -92,6 +95,52 @@ def after_request(response):
     g.db_cursor.close()
     g.db_conn.close()
     return response
+
+def getForms():
+    query = """
+    SELECT * FROM forms;    
+    """
+    g.db_cursor.execute(query)
+    forms = g.db_cursor.fetchall()
+    col_names = [desc[0] for desc in g.db_cursor.description]
+    form_dict = {form[0]: dict(zip(col_names,form)) for form in forms}
+    return form_dict
+
+def getFormByEmailAndName(email, form_name):
+    query = """
+    SELECT * FROM forms WHERE email = %s AND form_name = %s;
+    """
+    g.db_cursor.execute(query, (email, form_name))
+    form = g.db_cursor.fetchone()
+    
+    if form:
+        col_names = [desc[0] for desc in g.db_cursor.description]
+        return dict(zip(col_names, form))
+    else:
+        return None  # No form found matching the email and form_name
+
+
+def add_or_update_form(email, form_name, form_content, status, user_signature, approver_signature, approver_comment):
+    """Insert a new form or update an existing one based on email and form_name."""
+    query = """
+    INSERT INTO forms (email, form_name, form_content, status, user_signature, approver_signature, approver_comment)
+    VALUES (%s, %s, %s, %s, %s, %s, %s)
+    ON CONFLICT (email, form_name) 
+    DO UPDATE SET 
+        form_content = EXCLUDED.form_content,
+        status = EXCLUDED.status,
+        user_signature = EXCLUDED.user_signature,
+        approver_signature = EXCLUDED.approver_signature,
+        approver_comment = EXCLUDED.approver_comment;
+    """
+    try:
+        g.db_cursor.execute(query, (email, form_name, form_content, status, user_signature, approver_signature, approver_comment))
+        g.db_conn.commit()
+        print("Form added or updated successfully.")
+    except Exception as e:
+        g.db_conn.rollback()
+        print("Error:", e)
+
 
 # Microsoft Login URL
 @app.route("/login")
@@ -224,13 +273,7 @@ def index():
     userinfo = None
     if user:
         userinfo = get_user_by_email(user['email'])
-    g.db_cursor.execute("SELECT * FROM forms")
-    forms = g.db_cursor.fetchall()
-    print("forms: ",forms)
-    for form in forms:
-        if form[2] == "graduate student petition form":
-            print('helloo yes')
-        print(form[2])
+    forms = getForms()
     return render_template("index.html", user=userinfo,forms = forms)
 
 # Logout
@@ -249,26 +292,18 @@ def admin_dash():
         return "Forbidden", 403
     g.db_cursor.execute("SELECT * FROM users")
     users = g.db_cursor.fetchall()
-    print("users: ", users)
 
-    g.db_cursor.execute("SELECT * FROM forms")
-    forms = g.db_cursor.fetchall()
-    print("forms: ",forms)
-    print("forms len", len(forms))
+    forms = getForms()
     approver_signature_binary = None
     if (forms):
-        updated_forms = []
-        for form in forms:
-            forms_list = form
-            if form[6]:
-                approver_signature_binary = form[6]
-                forms_list = list(form)  # Convert the first tuple to a list
-                forms_list[6] = base64.b64encode(approver_signature_binary).decode('utf-8')
-                print("binary img generated: ",forms_list[6])  # Modify the list
-            updated_forms.append(tuple(forms_list))
+        for formId,formDetails in forms.items():
+            if formDetails.get("approver_signature"):
+                
+                formDetails["approver_signature"] = base64.b64encode(formDetails["approver_signature"]).decode('utf-8')
+                # print(formDetails.get("approver_signature"))
                   # Convert it back to a tuple if needed
-        forms = updated_forms
-    print("forms: ",forms)
+    # print("type",type(forms.get("approver_signature")))
+
     return render_template("admin.html",users=users,forms=forms)
 
 @app.route("/reactivate", methods=["POST"])
@@ -299,19 +334,25 @@ def handleGraduateStudentPetitionForm():
     print(userName)
     return render_template("forms/graduate_student_petition_form.html",userName=userName)
 
-@app.route("/undergraduate-transfer-form", methods=["GET", "POST"])
+@app.route("/return-form",methods=["POST"])
+def returnForm():
+    data = request.get_json()
+    returnedFormId = int(data.get("returnedFormId"))
+    comment = data.get("comment")
+    status = "returned"
+    print("returnedFormId: ",returnedFormId)
+    print("comment: ",comment)
+    forms = getForms()
+    returnedFormDetails = forms.get(returnedFormId)
+    print(forms)
+    print("details" , returnedFormDetails)
+    add_or_update_form(returnedFormDetails["email"], returnedFormDetails["form_name"],returnedFormDetails["form_content"],status,returnedFormDetails["user_signature"],returnedFormDetails["approver_signature"],comment)
+    return jsonify({"message": "successfully return form"})
+
+@app.route("/undergraduate-transfer-form")
 def undergraduateTransferForm():
     user = session.get("user")
     userName = user['name'].split(',')
-    # Store object in the session
-    if request.method == "POST":
-        # user_name = request.form['userName']
-        # user_email = request.form['email']
-        
-        # # Store the object in session
-        # session['user'] = {'name': user_name, 'email': user_email}
-        print("method post run")
-        return render_template("forms/undergraduate_transfer_form.html", userName = userName)
     return render_template("forms/undergraduate_transfer_form.html",userName=userName)
 # @app.route('/user-forms')
 # def user_forms():
@@ -383,8 +424,8 @@ def update_latex():
         # Update both columns
 
         query = '''
-        INSERT INTO forms (email, form_name, form_content, status, user_signature, approver_signature)
-        VALUES (%s, %s, %s, %s, %s, %s)
+        INSERT INTO forms (email, form_name, form_content, status, user_signature, approver_signature,approver_comment)
+        VALUES (%s, %s, %s, %s, %s, %s, %s)
         ON CONFLICT (email, form_name) 
         DO UPDATE SET 
             form_content = EXCLUDED.form_content,
@@ -395,7 +436,8 @@ def update_latex():
         user_email = user["email"].lower().strip()
         status = "pending"
         approver_signature = None
-        data = (user_email, form_name, latex_content, status, signature_binary,approver_signature)
+        approver_comment = ""
+        data = (user_email, form_name, latex_content, status, signature_binary,approver_signature,approver_comment)
         g.db_cursor.execute(query, data)
 
         g.db_conn.commit()

@@ -42,10 +42,17 @@
             >
           </p>
           <p>
-            - <span>Form Status:</span>{% set status = false %} {% for form in
-            forms %} {% if form[2] == "graduate student petition form" and not
-            status %} {% set status = true %} {{ form[4] }} {% endif %} {%
-            endfor %}
+            - <span>Form Status:</span>{% set status = false %} {% for
+            formId,formDetails in forms.items() %} {% if
+            formDetails.get("form_name") == "graduate student petition form" and
+            not status %} {% set status = true %} {{ formDetails.get("status")
+            }} <span> - </span>
+            <a
+              onclick="viewForm('{{formDetails.form_id}}','{{formDetails.email}}')"
+              class="view-submitted-form-btn"
+              >View submitted Form</a
+            >
+            {% endif %} {% endfor %}
           </p>
         </div>
         <div id="undergraduate-transfer-form-container" class="hidden">
@@ -57,10 +64,16 @@
             >
           </p>
           <p>
-            - <span>Form Status:</span>{% set status = false %} {% for form in
-            forms %} {% if form[2] == "undergraduate transfer form" and not
-            status %} {% set status = true %} {{ form[4] }} {% endif %} {%
-            endfor %}
+            - <span>Form Status:</span>{% set status = false %} {% for formId,
+            formDetails in forms.items() %} {% if formDetails.get("form_name")
+            == "undergraduate transfer form" and not status %} {% set status =
+            true %} {{ formDetails.get("status") }} <span> - </span>
+            <a
+              onclick="viewForm('{{formDetails.form_id}}','{{formDetails.email}}')"
+              class="view-submitted-form-btn"
+              >View submitted Form</a
+            >
+            {% endif %} {% endfor %}
           </p>
         </div>
       </section>

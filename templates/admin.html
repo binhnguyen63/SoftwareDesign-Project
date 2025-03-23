@@ -70,24 +70,26 @@
           <th>Action</th>
           <th>Admin Approval Signature </th>
         </tr>
-        {%for form in forms%}
-        {%if form[2]%}
+        {%for formId,formDetails in forms.items()%}
         <tr>
-          <td>{{form[0]}}</td>
-          <td onclick="viewForm('{{form[0]}}','{{form[1]}}')" id="form-name">{{form[2]}}</td>
-          <td>{{form[1]}}</td>
-          <td>{{form[4]}}</td>
+          <td>{{formDetails["form_id"]}}</td>
+          <td onclick="viewForm('{{formDetails.form_id}}','{{formDetails.email}}')" id="form-name">{{formDetails["form_name"]}}</td>
+          <td>{{formDetails["email"]}}</td>
+          <td>{{formDetails["status"]}}</td>
           <td>
-            {%if form[4] == "pending"%}
-            <button onclick="openApprovalModal('{{ form[0] }}')">Approve</button>
-            {%endif%}
-            <button>Request more  Info</button>
+            {%if formDetails["status"] == "pending"%}
+            <button onclick="openApprovalModal('{{ formDetails.form_id }}')">Approve</button>
+            <button id="request-info-btn" class="{{ formDetails.form_id }}">Request more Info</button>
+            {%elif formDetails["status"] == "returned"%}
+            <button onclick="openApprovalModal('{{ formDetails.form_id }}')">Approve</button>
+            {% endif %}
+
+
           </td>
           <td>
-            <img src="data:image/png;base64,{{form[6]}}" width="50">
+            <img src="data:image/png;base64,{{formDetails.approver_signature}}" width="50">
           </td>
         </tr>
-        {%endif%}
         {%endfor%}
       </table>
     </div>
