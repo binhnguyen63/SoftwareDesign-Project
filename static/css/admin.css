@@ -161,7 +161,7 @@ select:disabled {
 }
 
 /* Form Name Hover Effect */
-#form-name:hover {
+.form-name:hover {
   color: blue;
   cursor: pointer;
   text-decoration: underline;

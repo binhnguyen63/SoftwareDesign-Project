@@ -277,7 +277,47 @@ async function submitApproval() {
   }
 }
 
-async function requestMoreInfo(returnedFormId, comment) {
+// Open the "Request More Info" modal
+document.querySelectorAll(".request-info-btn").forEach((button) => {
+  button.addEventListener("click", (event) => {
+    const returnedFormId = event.target.id;
+    console.log("returendFormId1: ", returnedFormId);
+    document.getElementById("request-info-modal").style.display = "block";
+    document.getElementsByClassName("request-info-btn").disabled = true; // Disable the button after clicking
+    document.getElementById("request-info-modal").dataset.formId =
+      returnedFormId;
+    console.log(document.getElementById("request-info-modal").dataset);
+  });
+});
+
+// Close the "Request More Info" modal
+function closeRequestInfoModal() {
+  document.getElementById("request-info-modal").style.display = "none";
+}
+
+// document
+//   .getElementById("request-info-btn")
+//   .addEventListener("click", async (event) => {
+//     console.log("request more info btn clicked");
+//     const returnedFormId = event.target.classList[0];
+//     console.log("returnedFormId: ", returnedFormId);
+//     const comment = "need more info";
+
+//     await requestMoreInfo(returnedFormId, comment);
+//     document.getElementById("request-info-btn").disabled = true;
+//   });
+
+async function submitRequestInfo() {
+  const returnedFormId =
+    document.getElementById("request-info-modal").dataset.formId;
+  console.log(returnedFormId);
+  const comment = document.getElementById("request-info-reason").value;
+
+  if (!comment) {
+    alert("Please provide a reason.");
+    return;
+  }
+
   try {
     const response = await fetch("/return-form", {
       method: "POST",
@@ -299,15 +339,3 @@ async function requestMoreInfo(returnedFormId, comment) {
     console.error("Request failed - return file to request more info", error);
   }
 }
-
-document
-  .getElementById("request-info-btn")
-  .addEventListener("click", async (event) => {
-    console.log("request more info btn clicked");
-    const returnedFormId = event.target.classList[0];
-    console.log("returnedFormId: ", returnedFormId);
-    const comment = "need more info";
-
-    await requestMoreInfo(returnedFormId, comment);
-    document.getElementById("request-info-btn").disabled = true;
-  });

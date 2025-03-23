@@ -46,12 +46,19 @@
             formId,formDetails in forms.items() %} {% if
             formDetails.get("form_name") == "graduate student petition form" and
             not status %} {% set status = true %} {{ formDetails.get("status")
-            }} <span> - </span>
-            <a
+            }}
+            {%if formDetails.get("status") == "returned"%}
+            <span> - reason: {{formDetails.get("approver_comment")}} </span>
+            {%endif%}
+            <div>
+              <span> - </span>
+              <a
               onclick="viewForm('{{formDetails.form_id}}','{{formDetails.email}}')"
               class="view-submitted-form-btn"
               >View submitted Form</a
             >
+            </div>
+
             {% endif %} {% endfor %}
           </p>
         </div>
@@ -67,12 +74,18 @@
             - <span>Form Status:</span>{% set status = false %} {% for formId,
             formDetails in forms.items() %} {% if formDetails.get("form_name")
             == "undergraduate transfer form" and not status %} {% set status =
-            true %} {{ formDetails.get("status") }} <span> - </span>
+            true %} {{ formDetails.get("status") }} 
+            {%if formDetails.get("status") == "returned"%}
+            <span> - reason: {{formDetails.get("approver_comment")}} </span>
+            {%endif%}
+            <div>
+              <span> - </span>
             <a
               onclick="viewForm('{{formDetails.form_id}}','{{formDetails.email}}')"
               class="view-submitted-form-btn"
               >View submitted Form</a
             >
+            </div>
             {% endif %} {% endfor %}
           </p>
         </div>
