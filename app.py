@@ -330,9 +330,11 @@ def reactivate_account():
 def handleGraduateStudentPetitionForm():
     user = session.get("user")
     userName = user['name'].split(",")
-
-    print(userName)
-    return render_template("forms/graduate_student_petition_form.html",userName=userName)
+    filled = False
+    
+    if getFormByEmailAndName(user.get("email"),"graduate student petition form"):
+        filled = True
+    return render_template("forms/graduate_student_petition_form.html",userName=userName,filled=filled)
 
 @app.route("/return-form",methods=["POST"])
 def returnForm():
@@ -353,7 +355,10 @@ def returnForm():
 def undergraduateTransferForm():
     user = session.get("user")
     userName = user['name'].split(',')
-    return render_template("forms/undergraduate_transfer_form.html",userName=userName)
+    filled = False
+    if getFormByEmailAndName(user.get("email"),"undergraduate transfer form"):
+        filled = True
+    return render_template("forms/undergraduate_transfer_form.html",userName=userName,filled=filled)
 # @app.route('/user-forms')
 # def user_forms():
 
@@ -487,6 +492,7 @@ def show_pdf():
 
     full_latex = result[0]  # Fetch LaTeX content from the database
     signature_image_data = result[1]  # Fetch signature image
+    print(signature_image_data)
     file_name = f"{userEmail}_petition"
     # Save the LaTeX content to a file
     with open(f"{file_name}.tex", "w", encoding="utf-8") as f:
@@ -494,7 +500,7 @@ def show_pdf():
 
     # Save the signature image (if available)
     if signature_image_data:
-        with open(f"{file_name}_signature.png", "wb") as f:
+        with open("signature.png", "wb") as f:
             f.write(signature_image_data)
         print("Signature image saved as signature.png")
 

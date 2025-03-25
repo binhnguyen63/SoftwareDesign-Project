@@ -14,7 +14,7 @@
     ></script>
   </head>
   <body>
-    {%if userName%}
+    {%if userName and not filled%}
     <nav>
       <a href="{{ url_for('index') }}" class="logo">Home</a>
       <span>Welcome, {{ userName[0] }}, {{userName[1]}}</span>
@@ -392,6 +392,8 @@
         <button type="submit">Submit</button>
       </form>
     </div>
+    {%endif%} {%if userName and filled%}
+    <p>YOU ALREADY FILLED OUT THIS FORM - PLEASE WAIT</p>
     {%endif%}
   </body>
 </html>

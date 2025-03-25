@@ -98,6 +98,28 @@ function currentDate() {
   document.getElementById("current_date").innerText = todayDate;
 }
 
+document
+  .getElementById("signature")
+  .addEventListener("change", function (event) {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        const img = new Image();
+        img.onload = function () {
+          const canvas = document.getElementById("signatureCanvas");
+          const ctx = canvas.getContext("2d");
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        };
+        img.src = e.target.result;
+        document.getElementById("signatureCanvas").dataset.signature =
+          e.target.result; // Store base64
+      };
+      reader.readAsDataURL(file);
+    }
+  });
+
 document.getElementById("fill-out").addEventListener("click", function (e) {
   // Auto-fill form fields
   e.preventDefault();
@@ -153,7 +175,48 @@ function generateLaTeX() {
     : "No";
   let explanation = document.getElementById("explanation").value;
 
-  return `\n    \\documentclass{article}\n    \\usepackage{geometry}\n    \\geometry{margin=1in}\n    \\begin{document}\n    \n    \\title{Undergraduate Student Credit Transfer Form}\n    \\maketitle\n    \n    \\section*{Student Information}\n    First Name: ${firstName}\\\\\n    Last Name: ${lastName}\\\\\n    UH ID: ${uhId}\\\\\n    Contact Phone: ${contactPhone}\\\\\n    \n    \\section*{Transfer Equivalency}\n    Transfer Institution: ${transferInstitution}\\\\\n    Subject Area: ${subjectArea}\\\\\n    Transfer Course Number: ${transferNumber}\\\\\n    Course Title: ${courseTitle}\\\\\n    \n    \\section*{Transfer Credit Request}\n    Core Credit: ${coreCredit}\\\\\n    Core Area: ${coreArea}\\\\\n    Course Credits: ${courseCredits}\\\\\n    \n    \\section*{Additional Information}\n    Expected to Graduate in Next 12 Months: ${graduationExpected}\\\\\n    PreReq for Upcoming Course Enrollment: ${coursePrereq}\\\\\n    Requirement for Major: ${majorRequirement}\\\\\n    Requirement for Minor: ${minorRequirement}\\\\\n    \n    \\section*{Explanation}\n    ${explanation}\\\\\n    \n    \\end{document}`;
+  return `
+  \\documentclass{article}
+  \\usepackage{geometry}
+  \\usepackage{graphicx}  % Ensure this is included
+  \\geometry{margin=1in}
+  \\begin{document}
+  
+  \\title{Undergraduate Student Credit Transfer Form}
+  \\maketitle
+  
+  \\section*{Student Information}
+  First Name: ${firstName} \\\\
+  Last Name: ${lastName} \\\\
+  UH ID: ${uhId} \\\\
+  Contact Phone: ${contactPhone} \\\\
+  
+  \\section*{Transfer Equivalency}
+  Transfer Institution: ${transferInstitution} \\\\
+  Subject Area: ${subjectArea} \\\\
+  Transfer Course Number: ${transferNumber} \\\\
+  Course Title: ${courseTitle} \\\\
+  
+  \\section*{Transfer Credit Request}
+  Core Credit: ${coreCredit} \\\\
+  Core Area: ${coreArea} \\\\
+  Course Credits: ${courseCredits} \\\\
+  
+  \\section*{Additional Information}
+  Expected to Graduate in Next 12 Months: ${graduationExpected} \\\\
+  PreReq for Upcoming Course Enrollment: ${coursePrereq} \\\\
+  Requirement for Major: ${majorRequirement} \\\\
+  Requirement for Minor: ${minorRequirement} \\\\
+  
+  \\section*{Explanation}
+  ${explanation} \\\\
+  
+  \\section*{Signature Section}
+  Student Signature: \\\\
+  \\includegraphics[width=7cm]{signature.png}
+  
+  \\end{document}
+  `;
 }
 
 function downloadLaTeX(content) {
