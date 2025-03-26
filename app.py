@@ -10,7 +10,7 @@ import io
 
 app = Flask(__name__)
 app.config.from_object(app_config)
-app.secret_key = "your_secret_key_here"  # Set a unique and secret key
+app.secret_key = "your_secret_key_here"
 SAVE_DIR = "saved_tex_files"
 os.makedirs(SAVE_DIR, exist_ok=True)
 
@@ -50,14 +50,13 @@ ON CONFLICT (email) DO NOTHING;
 
 
 def save_signature(base64_str):
-    image_data = base64.b64decode(base64_str.split(",")[1])  # Remove header
+    image_data = base64.b64decode(base64_str.split(",")[1])
     with open("signature.png", "wb") as f:
         f.write(image_data)
 
 def get_user_by_email(email):
     if not email:
         return None
-    """Retrieve a specific user from the database by email."""
     g.db_cursor.execute("SELECT email, name, role, account_status FROM users WHERE email = %s", (email,))
     user = g.db_cursor.fetchone()
 
@@ -68,14 +67,13 @@ def get_user_by_email(email):
             "role": user[2],
             "account_status": user[3],
         }
-    return None  # Return None if the user is not found
+    return None 
 
 
 
 
 @app.before_request
 def before_request():
-    """Create a database connection before each request."""
     g.db_conn = psycopg2.connect(
         host=app_config.DB_HOST,
         port=app_config.DB_PORT,
@@ -88,10 +86,8 @@ def before_request():
     g.db_conn.commit()
     print("Database connected")
 
-# After request: Close the connection
 @app.after_request
 def after_request(response):
-    """Close the database connection after each request."""
     g.db_cursor.close()
     g.db_conn.close()
     return response
@@ -117,11 +113,11 @@ def getFormByEmailAndName(email, form_name):
         col_names = [desc[0] for desc in g.db_cursor.description]
         return dict(zip(col_names, form))
     else:
-        return None  # No form found matching the email and form_name
+        return None 
 
 
 def add_or_update_form(email, form_name, form_content, status, user_signature, approver_signature, approver_comment):
-    """Insert a new form or update an existing one based on email and form_name."""
+
     query = """
     INSERT INTO forms (email, form_name, form_content, status, user_signature, approver_signature, approver_comment)
     VALUES (%s, %s, %s, %s, %s, %s, %s)
@@ -151,28 +147,22 @@ def login():
         'response_type': 'code',
         'redirect_uri': url_for('auth_response', _external=True),
         'scope': ' '.join(app_config.SCOPE),
-        'state': '12345'  # Security measure
+        'state': '12345'
     }
     return redirect(auth_url + urlencode(auth_params))
 
 @app.route("/add_user", methods=["POST"])
 def add_user():
-    data = request.json  # Get JSON data from frontend
+    data = request.json 
     email = data.get("email").lower()
     name = data.get("name")
-    role = data.get("role", "basicUser")  # Default role if not provided
-    account_status = data.get("account_status", True)  # Default status to active (True) if not provided
-
-    # Check if the user already exists in the database
+    role = data.get("role", "basicUser")
+    account_status = data.get("account_status", True) 
     g.db_cursor.execute("SELECT * FROM users WHERE email = %s", (email,))
-    user = g.db_cursor.fetchone()  # Use fetchone to get a single result
-
-    # If the user exists and is deactivated, return 401 Unauthorized
+    user = g.db_cursor.fetchone()
     if user:
-        if not user[3]:  # Assuming user[3] is the 'status' column in your database
+        if not user[3]:
             return jsonify({"error": "User is deactivated."}), 401
-
-    # If the user doesn't exist or is active, insert or do nothing
     if not user:
         g.db_cursor.execute(
             "INSERT INTO users (email, name, role, account_status) VALUES (%s, %s, %s, %s) ON CONFLICT (email) DO NOTHING",
@@ -185,10 +175,7 @@ def add_user():
 
 @app.route("/update_user", methods=["POST"])
 def update_user():
-    # if "user" not in session:
-    #     return "Unauthorized", 403
-
-    updated_users = request.json.get('users')  # Get the updated users from the request
+    updated_users = request.json.get('users') 
     print("updated user:" ,updated_users)
     for user_data in updated_users:
         email = user_data.get("email").lower()
@@ -199,7 +186,6 @@ def update_user():
             new_status = True
         else:
             new_status = False
-        # Prepare the SQL query to update the user information
         query = """
             UPDATE users 
             SET name = %s, role = %s, account_status = %s 
@@ -216,7 +202,6 @@ def delete_user():
     data = request.json
     email = data.get("email").lower()
     print("deleteing email: ",email)
-    # Check if the user exists before attempting to delete
     g.db_cursor.execute("SELECT * FROM users WHERE email = %s", (email,))
     user = g.db_cursor.fetchone()
     if not user:
@@ -269,7 +254,7 @@ def auth_response():
 # Home Page
 @app.route("/")
 def index():
-    user = session.get("user")  # Get user info from session
+    user = session.get("user") 
     userinfo = None
     if user:
         userinfo = get_user_by_email(user['email'])
@@ -279,7 +264,7 @@ def index():
 # Logout
 @app.route("/logout")
 def logout():
-    session.clear()  # Clear session
+    session.clear()
     return redirect("https://login.microsoftonline.com/common/oauth2/v2.0/logout?post_logout_redirect_uri=" + url_for('index', _external=True))
 
 @app.route("/admin")
@@ -300,25 +285,20 @@ def admin_dash():
             if formDetails.get("approver_signature"):
                 
                 formDetails["approver_signature"] = base64.b64encode(formDetails["approver_signature"]).decode('utf-8')
-                # print(formDetails.get("approver_signature"))
-                  # Convert it back to a tuple if needed
-    # print("type",type(forms.get("approver_signature")))
-
     return render_template("admin.html",users=users,forms=forms)
 
 @app.route("/reactivate", methods=["POST"])
 def reactivate_account():
     try:
-        # Get the email from the request body
-        data = request.get_json()  # Parse the JSON request
+
+        data = request.get_json()  
         email = data.get('email')
 
         if not email:
             return jsonify({"success": False, "message": "No email provided"}), 400
         
-        # Reactivate the user's account (update the database)
-        g.db_cursor.execute("UPDATE users SET account_status = %s WHERE email = %s", (True, email))  # Assuming True means active
-        g.db_cursor.connection.commit()  # Commit the changes to the database
+        g.db_cursor.execute("UPDATE users SET account_status = %s WHERE email = %s", (True, email))
+        g.db_cursor.connection.commit() 
         
         return jsonify({"success": True, "message": "Account reactivated successfully"})
     
@@ -359,10 +339,6 @@ def undergraduateTransferForm():
     if getFormByEmailAndName(user.get("email"),"undergraduate transfer form"):
         filled = True
     return render_template("forms/undergraduate_transfer_form.html",userName=userName,filled=filled)
-# @app.route('/user-forms')
-# def user_forms():
-
-
 
 @app.route('/approve-form', methods=['POST'])
 def approve_form():
@@ -426,7 +402,6 @@ def update_latex():
             except (IndexError, ValueError):
                 return jsonify({"error": "Invalid signature format"}), 400
 
-        # Update both columns
 
         query = '''
         INSERT INTO forms (email, form_name, form_content, status, user_signature, approver_signature,approver_comment)
@@ -446,23 +421,6 @@ def update_latex():
         g.db_cursor.execute(query, data)
 
         g.db_conn.commit()
-        print("here 2")
-        # query = """
-        #     SELECT *
-        #     FROM users
-        #     WHERE email = %s
-        # """
-        # g.db_cursor.execute(query, (user["email"].lower().strip(),))
-        # updated_row = g.db_cursor.fetchone()
-        # updated_row_list = list(updated_row)  # Convert tuple to list for modification
-        # if isinstance(updated_row_list[5], memoryview):  # Assuming signature is at index 5
-        #     updated_row_list[5] = bytes(updated_row_list[5])  # Convert to bytes
-        # print("updated row: ", updated_row_list[4])
-        # # updated_row = g.db_cursor.fetchone()
-        # if not updated_row:
-                
-        #     return jsonify({"error": "No row updated. User may not exist"}), 404
-
         return jsonify({"message": "LaTeX and signature updated"})
 
     except Exception as e:
@@ -490,28 +448,27 @@ def show_pdf():
     if not result or not result[0]:
         return jsonify({"error": "No LaTeX content found for this user"}), 404
 
-    full_latex = result[0]  # Fetch LaTeX content from the database
-    signature_image_data = result[1]  # Fetch signature image
+    full_latex = result[0] 
+    signature_image_data = result[1] 
     print(signature_image_data)
     file_name = f"{userEmail}_petition"
-    # Save the LaTeX content to a file
+
     with open(f"{file_name}.tex", "w", encoding="utf-8") as f:
         f.write(full_latex)
 
-    # Save the signature image (if available)
+
     if signature_image_data:
         with open("signature.png", "wb") as f:
             f.write(signature_image_data)
         print("Signature image saved as signature.png")
 
-    # Run `make` to compile LaTeX
+
     process = subprocess.run(["make",f"TEX_FILE={file_name}"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
     if process.returncode != 0:
         print("Make failed with error:", process.stderr.decode())
         return jsonify({"error": process.stderr.decode()}), 500
 
-    # Read generated PDF into memory
     pdf_output = io.BytesIO()
     with open(f"{file_name}.pdf", "rb") as f:
         pdf_output.write(f.read())
@@ -522,5 +479,4 @@ def show_pdf():
 
 
 if __name__ == "__main__":
-    app.run(host='localhost', port=app_config.PORT)
-# hi
+    app.run(host='0.0.0.0', port=app_config.PORT)

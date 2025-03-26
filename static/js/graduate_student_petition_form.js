@@ -19,7 +19,6 @@ function getRandomFiveDigitNumber() {
   return Math.floor(10000 + Math.random() * 90000);
 }
 
-// Function to generate a random date within a given range
 function getRandomDate(startYear, endYear) {
   const start = new Date(startYear, 0, 1);
   const end = new Date(endYear, 11, 31);
@@ -28,7 +27,6 @@ function getRandomDate(startYear, endYear) {
   );
 }
 
-// Function to generate a random phone number
 function getRandomPhoneNumber() {
   const areaCode = Math.floor(100 + Math.random() * 900);
   const centralOfficeCode = Math.floor(100 + Math.random() * 900);
@@ -36,20 +34,10 @@ function getRandomPhoneNumber() {
   return `(${areaCode}) ${centralOfficeCode}-${lineNumber}`;
 }
 
-// Function to generate random data for the petition form
 function fillOutForm() {
-  // Fill out personal information
-  console.log("hi");
-  // document.querySelector('input[type="text"][required]').value =
-  //   getRandomString(5); // First Name
-  // document.querySelectorAll('input[type="text"]')[1].value = getRandomString(5); // Middle Name
-  // document.querySelectorAll('input[type="text"][required]')[1].value =
-  //   getRandomString(5); // Last Name
-  document.getElementById("uh_id").value = getRandomFiveDigitNumber(); // UH ID
+  document.getElementById("uh_id").value = getRandomFiveDigitNumber();
   document.querySelector('input[type="tel"][required]').value =
-    getRandomPhoneNumber(); // Contact Phone
-
-  // Fill out academic information
+    getRandomPhoneNumber();
   document.querySelector("#program").value = [
     "ARCH",
     "ARTS",
@@ -67,23 +55,14 @@ function fillOutForm() {
     "SOCW",
     "TECH",
   ][Math.floor(Math.random() * 15)];
-  // document.getElementById("career").value = [
-  //   "Graduate",
-  //   "Law",
-  //   "Optometry",
-  //   "Pharmacy",
-  // ][Math.floor(Math.random() * 4)];
   document.getElementById("career").value = "Law";
-  console.log(document.getElementById("career").value);
-  // Fill out petition effective section
+
   document.getElementById("effective_term").value = [
     "Spring",
     "Fall",
     "Summer",
   ][Math.floor(Math.random() * 3)]; // Effective Term
-  document.getElementById("year").value = Math.floor(2023 + Math.random() * 8); // Year
-
-  // Fill out petition options
+  document.getElementById("year").value = Math.floor(2023 + Math.random() * 8);
   document.querySelector("#update_program").checked = Math.random() > 0.5;
   document.querySelector("#admissions_status").checked = Math.random() > 0.5;
   document.querySelector("#add_new_concurrent").checked = Math.random() > 0.5;
@@ -100,21 +79,13 @@ function fillOutForm() {
   document.querySelector("#early_submission").checked = Math.random() > 0.5;
   document.querySelector("#other").checked = Math.random() > 0.5;
 
-  // If "Leave of Absence" is checked, add a random text for supporting documentation
   if (document.querySelector("#leave_of_absence").checked) {
     document.querySelector(".sub-item input").value =
       "Supporting documentation goes here";
   }
 
-  // Fill out explanation section
   document.querySelector('textarea[rows="5"]').value =
     "This is a random explanation for the petition request.";
-
-  // Fill out signature section
-  // Signature would typically be an actual signature, but here we'll just fill it with random text
-  // document.querySelector(
-  //   ".signature-section .form-row .form-group input"
-  // ).value = "Random Signature";
 }
 
 document.getElementById("fill-out").addEventListener("click", function (event) {
@@ -139,7 +110,7 @@ document
         };
         img.src = e.target.result;
         document.getElementById("signatureCanvas").dataset.signature =
-          e.target.result; // Store base64
+          e.target.result;
       };
       reader.readAsDataURL(file);
     }
@@ -150,7 +121,6 @@ document
   .addEventListener("submit", async function (event) {
     event.preventDefault();
 
-    // Gather form data
     const formData = new FormData(this);
     const data = {};
 
@@ -160,9 +130,7 @@ document
 
     console.log(data);
     const canvas = document.getElementById("signatureCanvas");
-    const signatureBase64 = canvas.toDataURL("image/png"); // Convert to base64
-
-    // Prepare LaTeX content
+    const signatureBase64 = canvas.toDataURL("image/png"); //
     let latexContent = `
     \\documentclass[a4paper,12pt]{article}
     \\usepackage{geometry}
@@ -256,8 +224,6 @@ document
     \\end{document}
     `;
 
-    // Create a Blob and trigger the download
-    // Send LaTeX content to backend
     try {
       const response = await fetch("/update-latex", {
         method: "POST",

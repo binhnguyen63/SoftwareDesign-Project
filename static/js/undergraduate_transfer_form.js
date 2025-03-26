@@ -2,13 +2,10 @@
 window.onload = currentDate;
 
 function addRowSearchContainer() {
-  // Get the table reference
   let table = document.getElementById("transfer_equivalency");
 
-  // Create a new row
-  let newRow = table.insertRow(-1); // Inserts at the last position
+  let newRow = table.insertRow(-1);
 
-  // Declare rows
   let cols = [
     `<div class="search-container">
             <input type="text" name="transfer_institution">
@@ -30,7 +27,6 @@ function addRowSearchContainer() {
     `<input type="text" name="credits_taken" value="0.00" readonly>`,
   ];
 
-  // Insert each column into the new row
   cols.forEach((col, index) => {
     let cell = newRow.insertCell(index);
     cell.innerHTML = col;
@@ -38,22 +34,17 @@ function addRowSearchContainer() {
 }
 
 function deleteRowSearchContainer(button) {
-  let row = button.parentNode.parentNode; // Get the row
+  let row = button.parentNode.parentNode;
   let table = row.parentNode;
   if (table.rows.length > 2) {
-    // Keep at least one row
     table.deleteRow(table.rows.length - 1);
   }
 }
 
 function addRowAttachmentBox() {
-  // Get table
   let table = document.getElementById("attachment-box");
 
-  // Create rows
-  let newRow = table.insertRow(-1); // Inserts at the last position
-
-  // Declare rows
+  let newRow = table.insertRow(-1);
   let cols = [
     `<td></td>`,
     `<td><input type="file" id="attachments" name="attachments" accept="image/*" /></td>`,
@@ -69,7 +60,6 @@ function addRowAttachmentBox() {
     `<td><button onclick="deleteRowAttachmentBox(this)">Delete</button></td>`,
   ];
 
-  // Insert column into the new row
   cols.forEach((col, index) => {
     let cell = newRow.insertCell(index);
     cell.innerHTML = col;
@@ -114,14 +104,13 @@ document
         };
         img.src = e.target.result;
         document.getElementById("signatureCanvas").dataset.signature =
-          e.target.result; // Store base64
+          e.target.result;
       };
       reader.readAsDataURL(file);
     }
   });
 
 document.getElementById("fill-out").addEventListener("click", function (e) {
-  // Auto-fill form fields
   e.preventDefault();
   document.getElementById("uh_id").value = "12345678";
   document.getElementById("contact_phone").value = "(123) 456-7890";

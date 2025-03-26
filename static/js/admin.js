@@ -204,14 +204,14 @@ function viewForm(formId, userEmail) {
     .then((response) => response.blob())
     .then((blob) => {
       const url = URL.createObjectURL(blob);
-      window.open(url); // Opens the PDF in a new tab
+      window.open(url);
     })
     .catch((error) => {
       console.log("Error: ", error);
     });
 }
 
-let currentFormId = null; // Store the form ID being approved
+let currentFormId = null;
 document
   .getElementById("approver-signature")
   .addEventListener("change", function (event) {
@@ -228,14 +228,14 @@ document
         };
         img.src = e.target.result;
         document.getElementById("approver-signature-canvas").dataset.signature =
-          e.target.result; // Store base64
+          e.target.result;
       };
       reader.readAsDataURL(file);
     }
   });
 
 function openApprovalModal(formId) {
-  currentFormId = formId; // Save form ID
+  currentFormId = formId;
   document.getElementById("approval-modal").style.display = "block";
 }
 
@@ -267,7 +267,7 @@ async function submitApproval() {
     if (response.ok) {
       alert("Form approved successfully!");
       closeModal();
-      location.reload(); // Refresh the page to reflect the update
+      location.reload();
     } else {
       console.error("Approval failed");
       alert("Failed to approve form.");
@@ -277,7 +277,6 @@ async function submitApproval() {
   }
 }
 
-// Open the "Request More Info" modal
 document.querySelectorAll(".request-info-btn").forEach((button) => {
   button.addEventListener("click", (event) => {
     const returnedFormId = event.target.id;
@@ -294,18 +293,6 @@ document.querySelectorAll(".request-info-btn").forEach((button) => {
 function closeRequestInfoModal() {
   document.getElementById("request-info-modal").style.display = "none";
 }
-
-// document
-//   .getElementById("request-info-btn")
-//   .addEventListener("click", async (event) => {
-//     console.log("request more info btn clicked");
-//     const returnedFormId = event.target.classList[0];
-//     console.log("returnedFormId: ", returnedFormId);
-//     const comment = "need more info";
-
-//     await requestMoreInfo(returnedFormId, comment);
-//     document.getElementById("request-info-btn").disabled = true;
-//   });
 
 async function submitRequestInfo() {
   const returnedFormId =
