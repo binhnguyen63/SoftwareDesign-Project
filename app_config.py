@@ -3,7 +3,7 @@ from dotenv import load_dotenv
 load_dotenv(override=True)
 # Application (client) ID of app registration
 CLIENT_ID = os.getenv("CLIENT_ID")
-print("here",CLIENT_ID)
+
 # Application's generated client secret: never check this into source control!
 CLIENT_SECRET = os.getenv("CLIENT_SECRET")
 
@@ -28,11 +28,9 @@ SCOPE = ["User.ReadBasic.All"]
 SESSION_TYPE = "filesystem"
 
 ADMIN = os.getenv("ADMIN")
-# Using the file system will not work in most production systems,
-# it's better to use a database-backed session store instead.
+
 DB_HOST = os.getenv("DB_HOST")
 DB_PORT = os.getenv("DB_PORT")
-print(DB_PORT)
 DB_NAME = os.getenv("DB_NAME")
 DB_USER = os.getenv("DB_USER")
 DB_PASSWORD = os.getenv("DB_PASSWORD")

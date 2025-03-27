@@ -7,6 +7,7 @@ import os
 import subprocess
 import base64
 import io
+import logging
 
 app = Flask(__name__)
 app.config.from_object(app_config)
@@ -469,4 +470,13 @@ def show_pdf():
 
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=app_config.PORT)
+    # Suppress Flask's default logging
+    log = logging.getLogger('werkzeug')
+    log.setLevel(logging.ERROR)  # Suppress the default log messages
+
+    # Your custom print statement
+    print(f"Running on http://localhost:{app_config.PORT}")
+    
+    # Run the app
+    app.run(host='0.0.0.0', port=app_config.PORT, use_reloader=False)
+    
