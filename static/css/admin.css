@@ -29,6 +29,7 @@ body {
   cursor: pointer;
   transition: background-color 0.3s ease;
   margin: 5px;
+  border-radius: 6px;
 }
 
 .action-buttons button:hover {
@@ -37,33 +38,35 @@ body {
 
 /* Tables */
 table {
-  border: 2px solid black;
   border-collapse: collapse;
   width: 100%;
   max-width: 100%;
   margin: 20px 0;
-  background-color: white;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  margin-bottom: 3rem;
 }
 
 th,
 td {
-  border: 1px solid black;
-  padding: 12px;
+  padding: 12px 15px;
   text-align: left;
 }
 
-tr:nth-child(even) {
-  background-color: #f2f2f2;
-}
-
 th {
-  background-color: #f2f2f2;
+  color: black;
+  background-color: #a9a9a9;
   font-weight: bold;
 }
 
 tr:hover {
-  background-color: #f9f9f9;
+  background-color: #d6d8db;
+  transition: background 0.3s ease-in-out;
+}
+tr {
+  border-bottom: 1px solid #ccc;
 }
 
 select {
@@ -97,8 +100,9 @@ select:disabled {
 }
 
 .btn {
-  border-width: 1px 1px 3px 1px;
+  border-width: 1px 1px 1px 1px;
   text-shadow: none;
+  border: none;
 }
 
 /* Modal */
