@@ -57,4 +57,4 @@ http://localhost:5002/
 
 - IMPORTANT:
   - Please match the port to the port number specified in env file
-  - Website will not work if you use 0.0.0.0 or 127.0.0.1. PLEASE ONLY USE localhost
+  - Website will not work if you use 0.0.0.0 or 127.0.0.1. PLEASE ONLY USE http://localhost
