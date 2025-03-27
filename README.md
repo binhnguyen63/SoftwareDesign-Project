@@ -41,6 +41,8 @@ docker build -t vernon .
 
 ### Step 3: Run THe Docker Container
 
+run the folowing command:
+
 docker run --env-file .env -p 5002:5002 vernon
 
 - Please match the port to the port number specified in env file
