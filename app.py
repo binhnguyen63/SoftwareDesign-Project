@@ -282,7 +282,7 @@ def admin_dash():
             if formDetails.get("approver_signature"):
                 
                 formDetails["approver_signature"] = base64.b64encode(formDetails["approver_signature"]).decode('utf-8')
-    return render_template("admin.html",users=users,forms=forms)
+    return render_template("admin.html",users=users,forms=forms,user=userInfo)
 
 @app.route("/reactivate", methods=["POST"])
 def reactivate_account():
@@ -305,13 +305,16 @@ def reactivate_account():
 
 @app.route("/graduate-student-petition-form")
 def handleGraduateStudentPetitionForm():
-    user = session.get("user")
+    user = session.get("user") 
+    userinfo = None
+    if user:
+        userinfo = get_user_by_email(user['email'])
     userName = user['name'].split(",")
     filled = False
     filledForm = getFormByEmailAndName(user.get("email"),"graduate student petition form")
     if filledForm and filledForm.get("status") != "returned":
         filled = True
-    return render_template("forms/graduate_student_petition_form.html",userName=userName,filled=filled)
+    return render_template("forms/graduate_student_petition_form.html",userName=userName,filled=filled,currUser=userinfo)
 
 @app.route("/return-form",methods=["POST"])
 def returnForm():
@@ -326,13 +329,16 @@ def returnForm():
 
 @app.route("/undergraduate-transfer-form")
 def undergraduateTransferForm():
-    user = session.get("user")
+    user = session.get("user") 
+    userinfo = None
+    if user:
+        userinfo = get_user_by_email(user['email'])
     userName = user['name'].split(',')
     filled = False
     filledForm = getFormByEmailAndName(user.get("email"),"undergraduate transfer form")
     if filledForm and filledForm.get("status") != "returned":
         filled = True
-    return render_template("forms/undergraduate_transfer_form.html",userName=userName,filled=filled)
+    return render_template("forms/undergraduate_transfer_form.html",userName=userName,filled=filled,currUser=userinfo)
 
 @app.route('/approve-form', methods=['POST'])
 def approve_form():

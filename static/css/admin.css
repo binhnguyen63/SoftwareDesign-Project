@@ -6,30 +6,6 @@ body {
   padding: 0;
 }
 
-/* Navigation Bar */
-nav {
-  overflow: hidden;
-
-  background-color: #cb142c;
-}
-
-.nav-button {
-  color: #f2f2f2;
-  text-align: center;
-  padding: 14px 16px;
-  font-size: 17px;
-  border: none;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-  text-decoration: none;
-  display: inline-block;
-}
-
-.nav-button:hover {
-  background-color: #860f1e;
-  color: white;
-}
-
 /* Action Buttons */
 .action-buttons {
   margin: 20px 0;
@@ -201,4 +177,36 @@ select:disabled {
 
 .hidden {
   display: none;
+}
+
+/* Navigation Bar */
+nav {
+  background-color: #cb142c;
+  color: white;
+  padding: 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+nav a {
+  color: white;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.btn {
+  background-color: white;
+  color: #160204 !important;
+  padding: 10px 15px;
+  border-radius: 5px;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.logo {
+  margin-right: 2rem;
+}
+.container {
+  margin: 1rem;
 }
