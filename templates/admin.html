@@ -63,7 +63,7 @@
             </td>
             <td>
                 {%if user[2].lower() != 'admin'%}
-                <button class = "btn btn-primary" onclick="deleteRow(this, '{{ user[0] }}')">Delete</button>
+                <button class = "alterbtn btn-primary" onclick="deleteRow(this, '{{ user[0] }}')">Delete</button>
                 {%endif%}
             </td>
           </tr>
@@ -94,8 +94,8 @@
             </td>
             <td>
               {%if formDetails["status"] == "pending"%}
-              <button onclick="openApprovalModal('{{ formDetails.form_id }}')">Approve</button>
-              <button class="request-info-btn" id="{{ formDetails.form_id }}">Request more Info</button>
+              <button class="alterbtn btn-primary" onclick="openApprovalModal('{{ formDetails.form_id }}')">Approve</button>
+              <button class="request-info-btn alterbtn btn-primary" id="{{ formDetails.form_id }}">Request more Info</button>
               {%elif formDetails["status"] == "returned"%}
               <button onclick="openApprovalModal('{{ formDetails.form_id }}')">Approve</button>
               {% endif %}
