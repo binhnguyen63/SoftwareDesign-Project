@@ -47,7 +47,6 @@ document
 1;
 function viewForm(formId, userEmail) {
   event.preventDefault();
-  console.log("fetching user pdf: ", userEmail);
   fetch("/show_pdf", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -65,7 +64,6 @@ function viewForm(formId, userEmail) {
 
 function viewForm(formId, userEmail) {
   event.preventDefault();
-  console.log("fetching user pdf: ", userEmail);
   fetch("/show_pdf", {
     method: "POST",
     headers: { "Content-Type": "application/json" },

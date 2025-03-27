@@ -93,7 +93,6 @@ function addUser(email, name, role, status) {
 
 function deleteRow(button, email) {
   let row = button.parentNode.parentNode;
-  console.log(row);
   row.parentNode.removeChild(row);
   deleteUser(email);
 }
@@ -111,9 +110,7 @@ function enableEditing() {
       continue;
     for (let j = 1; j < 4; j++) {
       table.rows[i].cells[j].contentEditable = "true";
-      console.log(table.rows[i].cells[j]);
       const dropDownEle = table.rows[i].cells[j].querySelector("select");
-      console.log(dropDownEle);
       if (dropDownEle) dropDownEle.disabled = false;
     }
   }
@@ -139,7 +136,6 @@ function confirmUpdate() {
       }
     }
   }
-  console.log(updatedUsers);
   if (updatedUsers.length > 0) {
     fetch("/update_user", {
       method: "POST",
@@ -195,7 +191,6 @@ function deleteUser(email) {
 
 function viewForm(formId, userEmail) {
   event.preventDefault();
-  console.log("fetching user pdf: ", userEmail);
   fetch("/show_pdf", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -280,12 +275,10 @@ async function submitApproval() {
 document.querySelectorAll(".request-info-btn").forEach((button) => {
   button.addEventListener("click", (event) => {
     const returnedFormId = event.target.id;
-    console.log("returendFormId1: ", returnedFormId);
     document.getElementById("request-info-modal").style.display = "block";
     document.getElementsByClassName("request-info-btn").disabled = true; // Disable the button after clicking
     document.getElementById("request-info-modal").dataset.formId =
       returnedFormId;
-    console.log(document.getElementById("request-info-modal").dataset);
   });
 });
 
@@ -297,7 +290,6 @@ function closeRequestInfoModal() {
 async function submitRequestInfo() {
   const returnedFormId =
     document.getElementById("request-info-modal").dataset.formId;
-  console.log(returnedFormId);
   const comment = document.getElementById("request-info-reason").value;
 
   if (!comment) {

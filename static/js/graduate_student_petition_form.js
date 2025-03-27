@@ -90,7 +90,6 @@ function fillOutForm() {
 
 document.getElementById("fill-out").addEventListener("click", function (event) {
   event.preventDefault();
-  console.log("heree");
   fillOutForm();
 });
 
@@ -128,7 +127,6 @@ document
       data[key] = value;
     });
 
-    console.log(data);
     const canvas = document.getElementById("signatureCanvas");
     const signatureBase64 = canvas.toDataURL("image/png"); //
     let latexContent = `

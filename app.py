@@ -137,7 +137,6 @@ def add_or_update_form(email, form_name, form_content, status, user_signature, a
         g.db_conn.rollback()
         print("Error:", e)
 
-
 # Microsoft Login URL
 @app.route("/login")
 def login():
@@ -176,7 +175,6 @@ def add_user():
 @app.route("/update_user", methods=["POST"])
 def update_user():
     updated_users = request.json.get('users') 
-    print("updated user:" ,updated_users)
     for user_data in updated_users:
         email = user_data.get("email").lower()
         new_name = user_data.get("name")
@@ -201,7 +199,6 @@ def delete_user():
 
     data = request.json
     email = data.get("email").lower()
-    print("deleteing email: ",email)
     g.db_cursor.execute("SELECT * FROM users WHERE email = %s", (email,))
     user = g.db_cursor.fetchone()
     if not user:
@@ -322,12 +319,8 @@ def returnForm():
     returnedFormId = int(data.get("returnedFormId"))
     comment = data.get("comment")
     status = "returned"
-    print("returnedFormId: ",returnedFormId)
-    print("comment: ",comment)
     forms = getForms()
     returnedFormDetails = forms.get(returnedFormId)
-    print(forms)
-    print("details" , returnedFormDetails)
     add_or_update_form(returnedFormDetails["email"], returnedFormDetails["form_name"],returnedFormDetails["form_content"],status,returnedFormDetails["user_signature"],returnedFormDetails["approver_signature"],comment)
     return jsonify({"message": "successfully return form"})
 
@@ -343,16 +336,12 @@ def undergraduateTransferForm():
 @app.route('/approve-form', methods=['POST'])
 def approve_form():
     try:
-        print("approve formmmm")
         user = session.get("user")
         if not user or "email" not in user:
             print("yes")
             return jsonify({"error": "User not authenticated"}), 401
-        print("data approve form got 0")
         data = request.get_json()
-        print("data approve form got")
         formId = data.get("formId")
-        print("form id",formId)
         approverSignatureBase64 = data.get("approverSignatureBase64")
         status = data.get("status")
         approver_signature_binary = None
@@ -362,17 +351,14 @@ def approve_form():
             except (IndexError, ValueError):
                 return jsonify({"error": "Invalid signature format"}), 400
 
-        print("hereeee")
         query = """
         UPDATE forms
         SET status = %s, approver_signature = %s
         WHERE form_id = %s;
         """
         data = (status,approver_signature_binary,formId)
-        print("databaseee")
         g.db_cursor.execute(query,data)
         g.db_conn.commit()
-        print("databaseee done")
         return jsonify({"message": "approved form"})
 
     except Exception as e:
@@ -411,8 +397,6 @@ def update_latex():
             form_content = EXCLUDED.form_content,
             user_signature = EXCLUDED.user_signature;
         '''
-        print("here 1")
-        print(user["email"].lower().strip())
         user_email = user["email"].lower().strip()
         status = "pending"
         approver_signature = None
@@ -435,7 +419,6 @@ def show_pdf():
 
     formId = data["formId"]
     userEmail = data["userEmail"]
-    print("got user email: ", formId)
 
     query_latex = """
     SELECT form_content, user_signature
@@ -449,8 +432,8 @@ def show_pdf():
         return jsonify({"error": "No LaTeX content found for this user"}), 404
 
     full_latex = result[0] 
-    signature_image_data = result[1] 
-    print(signature_image_data)
+    signature_image_data = result[1]
+
     file_name = f"{userEmail}_petition"
 
     with open(f"{file_name}.tex", "w", encoding="utf-8") as f:
