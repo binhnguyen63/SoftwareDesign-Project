@@ -107,4 +107,4 @@ venv.bak/
 flask_session/
 
 
-signature.png
+*.png
