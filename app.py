@@ -308,8 +308,8 @@ def handleGraduateStudentPetitionForm():
     user = session.get("user")
     userName = user['name'].split(",")
     filled = False
-    
-    if getFormByEmailAndName(user.get("email"),"graduate student petition form"):
+    filledForm = getFormByEmailAndName(user.get("email"),"graduate student petition form")
+    if filledForm and filledForm.get("status") != "returned":
         filled = True
     return render_template("forms/graduate_student_petition_form.html",userName=userName,filled=filled)
 
@@ -329,7 +329,8 @@ def undergraduateTransferForm():
     user = session.get("user")
     userName = user['name'].split(',')
     filled = False
-    if getFormByEmailAndName(user.get("email"),"undergraduate transfer form"):
+    filledForm = getFormByEmailAndName(user.get("email"),"undergraduate transfer form")
+    if filledForm and filledForm.get("status") != "returned":
         filled = True
     return render_template("forms/undergraduate_transfer_form.html",userName=userName,filled=filled)
 
