@@ -11,7 +11,15 @@ You can run this program using the **Dockerfile**. Follow the steps below to get
 ### Step 1: Create the `.env` File
 
 ```
-Change .env.example to .env
+CLIENT_ID=eb69d6cc-2944-470e-902e-83b87798b51b
+CLIENT_SECRET=Y7y8Q~SbTsxzFAJiv~bgWKatw12XZdPQpPNRWdwV
+# Use these variable if you are working on localhost. Comment out if using Docker
+
+# DB_HOST=localhost
+# DB_PORT=5433
+# DB_NAME=postgres
+# DB_USER=postgres
+# DB_PASSWORD=bennguyen2511
 ```
 
 - Important:
