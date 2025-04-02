@@ -14,8 +14,8 @@ function addRow() {
   roleCell.innerHTML = `
   <select>
       <option value="admin">Admin</option>
-      <option value="basicUser" selected>basicUser</option>
-      <option value="vipUser">vipUser</option>
+      <option value="undergraduate-student" selected>basicUser</option>
+      <option value="graduate-student">graduate-student</option>
     </select>
     `;
   let statusCell = row.insertCell(3);
@@ -238,39 +238,42 @@ function closeModal() {
   document.getElementById("approval-modal").style.display = "none";
 }
 
-async function submitApproval() {
-  const canvas = document.getElementById("approver-signature-canvas");
-  const approverSignatureBase64 = canvas.toDataURL("image/png");
-  if (approverSignatureBase64.length === 0) {
-    alert("Please upload your signature.");
-    return;
-  }
-
-  try {
-    const response = await fetch("/approve-form", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        approverSignatureBase64,
-        formId: currentFormId,
-        status: "approved",
-      }),
-    });
-
-    if (response.ok) {
-      alert("Form approved successfully!");
-      closeModal();
-      location.reload();
-    } else {
-      console.error("Approval failed");
-      alert("Failed to approve form.");
+document
+  .getElementById("approval-form")
+  .addEventListener("submit", async function (event) {
+    event.preventDefault();
+    const canvas = document.getElementById("approver-signature-canvas");
+    const approverSignatureBase64 = canvas.toDataURL("image/png");
+    if (approverSignatureBase64.length === 0) {
+      alert("Please upload your signature.");
+      return;
     }
-  } catch (error) {
-    console.error("Error:", error);
-  }
-}
+
+    try {
+      const response = await fetch("/approve-form", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          approverSignatureBase64,
+          formId: currentFormId,
+          status: "approved",
+        }),
+      });
+
+      if (response.ok) {
+        alert("Form approved successfully!");
+        closeModal();
+        location.reload();
+      } else {
+        console.error("Approval failed");
+        alert("Failed to approve form.");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  });
 
 document.querySelectorAll(".request-info-btn").forEach((button) => {
   button.addEventListener("click", (event) => {

@@ -24,7 +24,11 @@
       <span>Welcome, {{ currUser.name }}</span>
       <a href="{{ url_for('logout') }}" class="btn">Logout</a>
     </nav>
-    {%if userName and not filled%}
+    {%if currUser.role == "undergraduate-student"%}
+    <p>
+      You don't have access to this form because you are not graduate-student
+    </p>
+    {%else%} {%if userName and not filled%}
     <div class="container">
       <div class="header">
         <h1>UNIVERSITY of HOUSTON</h1>
@@ -385,6 +389,7 @@
                 id="signature"
                 name="signature"
                 accept="image/*"
+                required
               />
               <canvas id="signatureCanvas" width="300" height="100"></canvas>
             </div>
@@ -399,6 +404,6 @@
     </div>
     {%endif%} {%if userName and filled%}
     <p>YOU ALREADY FILLED OUT THIS FORM - PLEASE WAIT</p>
-    {%endif%}
+    {%endif%} {%endif%}
   </body>
 </html>

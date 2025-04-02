@@ -15,11 +15,11 @@
     <nav>
       <div>
         <a href="{{ url_for('index') }}" class="logo">Home</a>
-        {%if user.role == "admin"%}
+        {%if currUser.role == "admin"%}
         <a href="{{ url_for('admin_dash') }}">Admin Dashboard</a>
         {%endif%}
       </div>
-      <span>Welcome, {{ user.name }}</span>
+      <span>Welcome, {{ currUser.name }}</span>
       <a href="{{ url_for('logout') }}" class="btn">Logout</a>
     </nav>
     </div>
@@ -44,26 +44,26 @@
             <th>Account Status</th>
             <th>Action</th>
           </tr>
-          {% for user in users %}
+          {% for userEmail,userInfo in users.items() %}
           <tr>
-            <td contenteditable="false">{{ user[0] }}</td>
-            <td contenteditable="false">{{ user[1] }}</td>
+            <td contenteditable="false">{{ userEmail }}</td>
+            <td contenteditable="false">{{ userInfo.get("name") }}</td>
             <td>
               <select disabled>
-                <option value="admin" {% if user[2] == 'admin' %}selected{% endif %}>Admin</option>
-                <option value="basicUser" {% if user[2] == 'basicUser' %}selected{% endif %}>basicUser</option>
-                <option value="vipUser" {% if user[2] == 'vipUser' %}selected{% endif %}>vipUser</option>
+                <option value="admin" {% if userInfo.get("role") == 'admin' %}selected{% endif %}>Admin</option>
+                <option value="undergraduate-student" {% if userInfo.get("role") == 'undergraduate-student' %}selected{% endif %}>undergraduate-student</option>
+                <option value="graduate-student" {% if userInfo.get("role") == 'graduate-student' %}selected{% endif %}>graduate-student</option>
               </select>
             </td>
             <td>
                 <select disabled>
-                    <option value="True" {% if user[3]%}selected{%endif%}>Active</option>
-                    <option value="False" {% if not user[3]%}selected{%endif%}>Deactivated</option>
+                    <option value="True" {% if userInfo.get("account_status")%}selected{%endif%}>Active</option>
+                    <option value="False" {% if not userInfo.get("account_status")%}selected{%endif%}>Deactivated</option>
                 </select>
             </td>
             <td>
-                {%if user[2].lower() != 'admin'%}
-                <button class = "alterbtn btn-primary" onclick="deleteRow(this, '{{ user[0] }}')">Delete</button>
+                {%if userInfo.get("role").lower() != 'admin'%}
+                <button class = "alterbtn btn-primary" onclick="deleteRow(this, '{{userEmail}}')">Delete</button>
                 {%endif%}
             </td>
           </tr>
@@ -122,14 +122,17 @@
   
       <div id="approval-modal" class="modal">
         <div class="modal-content">
-          <span class="close" onclick="closeModal()">&times;</span>
-          <h2>Approve Form</h2>
-          <p>Upload your signature to approve the form.</p>
-          <input type="file" id="approver-signature" accept="image/*" name="approver-signature">
-          <canvas id="approver-signature-canvas" width="300" height="300"></canvas>
-          <button onclick="submitApproval()">Submit Approval</button>
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h2>Approve Form</h2>
+            <p>Upload your signature to approve the form.</p>
+    
+            <form id="approval-form">
+                <input type="file" id="approver-signature" accept="image/*" name="approver-signature" required>
+                <canvas id="approver-signature-canvas" width="300" height="150"></canvas>
+                <button type="submit">Submit Approval</button>
+            </form>
         </div>
-      </div>
+    </div>
     </div>
 
   </body>

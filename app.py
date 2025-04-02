@@ -41,10 +41,10 @@ VALUES
     (LOWER('tbnguy36@CougarNet.UH.EDU'), 'Nguyen, Binh', 'admin', TRUE),
     (LOWER('fmmancil@cougarnet.uh.edu'), 'Mancilla, Fernando', 'admin', TRUE),
     (LOWER('rlpham3@cougarnet.uh.edu'), 'Pham, Ryan', 'admin', TRUE),
-    (LOWER('john.doe@CougarNet.UH.EDU'), 'John Doe', 'basicUser', TRUE),
-    (LOWER('jane.smith@CougarNet.UH.EDU'), 'Jane Smith', 'basicUser', FALSE),
-    (LOWER('alice.johnson@CougarNet.UH.EDU'), 'Alice Johnson', 'vipUser', TRUE),
-    (LOWER('bob.williams@CougarNet.UH.EDU'), 'Bob Williams', 'vipUser', FALSE)
+    (LOWER('john.doe@CougarNet.UH.EDU'), 'John Doe', 'undergraduate-student', TRUE),
+    (LOWER('jane.smith@CougarNet.UH.EDU'), 'Jane Smith', 'undergraduate-student', FALSE),
+    (LOWER('alice.johnson@CougarNet.UH.EDU'), 'Alice Johnson', 'graduate-student', TRUE),
+    (LOWER('bob.williams@CougarNet.UH.EDU'), 'Bob Williams', 'graduate-student', FALSE)
 ON CONFLICT (email) DO NOTHING;
 
 """
@@ -70,9 +70,6 @@ def get_user_by_email(email):
         }
     return None 
 
-
-
-
 @app.before_request
 def before_request():
     g.db_conn = psycopg2.connect(
@@ -93,16 +90,24 @@ def after_request(response):
     g.db_conn.close()
     return response
 
-def getForms():
-    query = """
-    SELECT * FROM forms;    
-    """
+def getTable(tableName):
+    query = f"SELECT * FROM {tableName};"
     g.db_cursor.execute(query)
     forms = g.db_cursor.fetchall()
     col_names = [desc[0] for desc in g.db_cursor.description]
     form_dict = {form[0]: dict(zip(col_names,form)) for form in forms}
     return form_dict
 
+def getUserInfo(email):
+    query = f"SELECT * FROM users WHERE email = %s"
+    g.db_cursor.execute(query,(email,))
+    user = g.db_cursor.fetchone()
+
+    if user:
+        col_names = [desc[0] for desc in g.db_cursor.description]
+        return dict(zip(col_names,user))
+    else:
+        return None
 def getFormByEmailAndName(email, form_name):
     query = """
     SELECT * FROM forms WHERE email = %s AND form_name = %s;
@@ -156,12 +161,11 @@ def add_user():
     data = request.json 
     email = data.get("email").lower()
     name = data.get("name")
-    role = data.get("role", "basicUser")
+    role = data.get("role", "undergraduate-student")
     account_status = data.get("account_status", True) 
-    g.db_cursor.execute("SELECT * FROM users WHERE email = %s", (email,))
-    user = g.db_cursor.fetchone()
+    user = getUserInfo(email)
     if user:
-        if not user[3]:
+        if not user.get("account_status"):
             return jsonify({"error": "User is deactivated."}), 401
     if not user:
         g.db_cursor.execute(
@@ -200,8 +204,7 @@ def delete_user():
 
     data = request.json
     email = data.get("email").lower()
-    g.db_cursor.execute("SELECT * FROM users WHERE email = %s", (email,))
-    user = g.db_cursor.fetchone()
+    user = getUserInfo(email)
     if not user:
         return {"message": "User not found"}, 404
 
@@ -256,7 +259,7 @@ def index():
     userinfo = None
     if user:
         userinfo = get_user_by_email(user['email'])
-    forms = getForms()
+    forms = getTable("forms")
     return render_template("index.html", user=userinfo,forms = forms)
 
 # Logout
@@ -270,20 +273,17 @@ def admin_dash():
     user = session.get("user")
     if not user:
         return "Forbidden", 403
-    userInfo = get_user_by_email(user['email'])
-    if (userInfo['role'].lower() != "admin"):
+    currUser = getUserInfo(user['email'])
+    if (currUser.get('role').lower() != "admin"):
         return "Forbidden", 403
-    g.db_cursor.execute("SELECT * FROM users")
-    users = g.db_cursor.fetchall()
-
-    forms = getForms()
-    approver_signature_binary = None
+    users = getTable("users")
+    forms = getTable("forms")
     if (forms):
         for formId,formDetails in forms.items():
             if formDetails.get("approver_signature"):
                 
                 formDetails["approver_signature"] = base64.b64encode(formDetails["approver_signature"]).decode('utf-8')
-    return render_template("admin.html",users=users,forms=forms,user=userInfo)
+    return render_template("admin.html",users=users,forms=forms,currUser=currUser)
 
 @app.route("/reactivate", methods=["POST"])
 def reactivate_account():
@@ -309,13 +309,13 @@ def handleGraduateStudentPetitionForm():
     user = session.get("user") 
     userinfo = None
     if user:
-        userinfo = get_user_by_email(user['email'])
+        userInfo = getUserInfo(user['email'])
     userName = user['name'].split(",")
     filled = False
     filledForm = getFormByEmailAndName(user.get("email"),"graduate student petition form")
     if filledForm and filledForm.get("status") != "returned":
         filled = True
-    return render_template("forms/graduate_student_petition_form.html",userName=userName,filled=filled,currUser=userinfo)
+    return render_template("forms/graduate_student_petition_form.html",userName=userName,filled=filled,currUser=userInfo)
 
 @app.route("/return-form",methods=["POST"])
 def returnForm():
@@ -323,7 +323,7 @@ def returnForm():
     returnedFormId = int(data.get("returnedFormId"))
     comment = data.get("comment")
     status = "returned"
-    forms = getForms()
+    forms = getTable("forms")
     returnedFormDetails = forms.get(returnedFormId)
     add_or_update_form(returnedFormDetails["email"], returnedFormDetails["form_name"],returnedFormDetails["form_content"],status,returnedFormDetails["user_signature"],returnedFormDetails["approver_signature"],comment)
     return jsonify({"message": "successfully return form"})
@@ -333,8 +333,8 @@ def undergraduateTransferForm():
     user = session.get("user") 
     userinfo = None
     if user:
-        userinfo = get_user_by_email(user['email'])
-    userName = user['name'].split(',')
+        userinfo = getUserInfo(user.get("email"))
+    userName = user.get('name').split(',')
     filled = False
     filledForm = getFormByEmailAndName(user.get("email"),"undergraduate transfer form")
     if filledForm and filledForm.get("status") != "returned":
