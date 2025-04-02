@@ -311,11 +311,12 @@ def handleGraduateStudentPetitionForm():
     if user:
         userInfo = getUserInfo(user['email'])
     userName = user['name'].split(",")
-    filled = False
     filledForm = getFormByEmailAndName(user.get("email"),"graduate student petition form")
-    if filledForm and filledForm.get("status") != "returned":
-        filled = True
-    return render_template("forms/graduate_student_petition_form.html",userName=userName,filled=filled,currUser=userInfo)
+    filledFormStatus = None
+    if filledForm:
+        filledFormStatus = filledForm.get("status")
+
+    return render_template("forms/graduate_student_petition_form.html",userName=userName,currUser=userInfo,filledFormStatus=filledFormStatus)
 
 @app.route("/return-form",methods=["POST"])
 def returnForm():
@@ -335,14 +336,14 @@ def undergraduateTransferForm():
     if user:
         userinfo = getUserInfo(user.get("email"))
     userName = user.get('name').split(',')
-    filled = False
     filledForm = getFormByEmailAndName(user.get("email"),"undergraduate transfer form")
-    if filledForm and filledForm.get("status") != "returned":
-        filled = True
-    return render_template("forms/undergraduate_transfer_form.html",userName=userName,filled=filled,currUser=userinfo)
+    filledFormStatus = None
+    if filledForm:
+        filledFormStatus = filledForm.get("status")
+    return render_template("forms/undergraduate_transfer_form.html",userName=userName,currUser=userinfo,filledFormStatus=filledFormStatus)
 
-@app.route('/approve-form', methods=['POST'])
-def approve_form():
+@app.route('/approve-deny-form', methods=['POST'])
+def approve_deny_form():
     try:
         user = session.get("user")
         if not user or "email" not in user:

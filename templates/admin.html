@@ -93,11 +93,10 @@
               {%endif%}
             </td>
             <td>
-              {%if formDetails["status"] == "pending"%}
-              <button class="alterbtn btn-primary" onclick="openApprovalModal('{{ formDetails.form_id }}')">Approve</button>
+              {%if formDetails["status"] != "approved" and formDetails["status"] != "denied" %}
+              <button class="alterbtn btn-primary" onclick="openApprovalModal('{{ formDetails.form_id }}',true)">Approve</button>
+              <button class="alterbtn btn-primary" onclick="openApprovalModal('{{ formDetails.form_id }}',false)">Deny</button>
               <button class="request-info-btn alterbtn btn-primary" id="{{ formDetails.form_id }}">Request more Info</button>
-              {%elif formDetails["status"] == "returned"%}
-              <button onclick="openApprovalModal('{{ formDetails.form_id }}')">Approve</button>
               {% endif %}
   
   

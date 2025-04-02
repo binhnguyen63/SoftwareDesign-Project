@@ -1,3 +1,4 @@
+let currentApproveStatus = null;
 function addRow() {
   let table = document.getElementById("userTable");
   let confirmCreateBtn = document.getElementById("confirm-create-btn");
@@ -228,10 +229,34 @@ document
       reader.readAsDataURL(file);
     }
   });
-
-function openApprovalModal(formId) {
+function openApprovalModal(formId, approve) {
   currentFormId = formId;
-  document.getElementById("approval-modal").style.display = "block";
+  const modal = document.getElementById("approval-modal");
+  const modalContent = modal.querySelector(".modal-content");
+
+  // Show the modal
+  modal.style.display = "block";
+
+  // Change modal content based on approve flag
+  if (approve) {
+    // Approve case
+    modalContent.querySelector("h2").textContent = "Approve Form";
+    modalContent.querySelector("p").textContent =
+      "Upload your signature to approve the form.";
+    modalContent.querySelector("button").textContent = "Submit Approval";
+    currentApproveStatus = "approved";
+  } else {
+    // Deny case
+    modalContent.querySelector("h2").textContent = "Deny Form";
+    modalContent.querySelector("p").textContent =
+      "Are you sure you want to deny this form?";
+    modalContent.querySelector("button").textContent = "Submit Denial";
+    currentApproveStatus = "denied";
+  }
+}
+
+function openDenyModal(formId) {
+  currentFormId = formId;
 }
 
 function closeModal() {
@@ -248,9 +273,9 @@ document
       alert("Please upload your signature.");
       return;
     }
-
+    const status = currentApproveStatus === "approved" ? "approved" : "denied";
     try {
-      const response = await fetch("/approve-form", {
+      const response = await fetch("/approve-deny-form", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -258,7 +283,7 @@ document
         body: JSON.stringify({
           approverSignatureBase64,
           formId: currentFormId,
-          status: "approved",
+          status,
         }),
       });
 

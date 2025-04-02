@@ -25,7 +25,7 @@
         You don't have access to this form because you are not undergraduate-student
       </p>
       {%else%}
-      {%if userName and not filled%}
+      {%if userName and filledFormStatus != "pending"%}
       <div class="container">
           <div class="header">
               <h1>UNIVERSITY of HOUSTON</h1>
@@ -271,7 +271,7 @@
   
           </form>
           {%endif%}
-          {%if userName and filled%}
+          {%if userName and filledFormStatus == "pending"%}
           <p>YOU ALREADY FILLED OUT THIS FORM - PLEASE WAIT</p>
           {%endif%}
       {%endif%}
