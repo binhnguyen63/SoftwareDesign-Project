@@ -13,8 +13,9 @@ You can run this program using the **Dockerfile**. Follow the steps below to get
 ```
 CLIENT_ID=eb69d6cc-2944-470e-902e-83b87798b51b
 CLIENT_SECRET=Y7y8Q~SbTsxzFAJiv~bgWKatw12XZdPQpPNRWdwV
-# Use these variable if you are working on localhost. Comment out if using Docker
 
+
+# Use bellow variables if you are working on localhost. Comment out if using Docker
 # DB_HOST=localhost
 # DB_PORT=5433
 # DB_NAME=postgres
