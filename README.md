@@ -20,7 +20,7 @@ CLIENT_SECRET=Y7y8Q~SbTsxzFAJiv~bgWKatw12XZdPQpPNRWdwV
 # DB_PORT=5433
 # DB_NAME=postgres
 # DB_USER=postgres
-# DB_PASSWORD=bennguyen2511
+# DB_PASSWORD=your_password
 ```
 
 - Important:
