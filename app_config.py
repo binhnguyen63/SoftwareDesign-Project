@@ -14,7 +14,7 @@ AUTHORITY = "https://login.microsoftonline.com/common"  # For multi-tenant app
 REDIRECT_PATH = "/getAToken"  # Used for forming an absolute URL to your redirect URI.
 # The absolute URL must match the redirect URI you set
 # in the app's registration in the Azure portal.
-PORT = os.getenv("PORT")
+PORT = os.getenv("PORT","5002")
 
 # You can find more Microsoft Graph API endpoints from Graph Explorer
 # https://developer.microsoft.com/en-us/graph/graph-explorer
@@ -29,8 +29,9 @@ SESSION_TYPE = "filesystem"
 
 ADMIN = os.getenv("ADMIN")
 
-DB_HOST = os.getenv("DB_HOST")
-DB_PORT = os.getenv("DB_PORT")
-DB_NAME = os.getenv("DB_NAME")
-DB_USER = os.getenv("DB_USER")
-DB_PASSWORD = os.getenv("DB_PASSWORD")
+DB_HOST = os.getenv("DB_HOST","db")
+DB_PORT = os.getenv("DB_PORT","5432")
+DB_NAME = os.getenv("DB_NAME","postgres")
+DB_USER = os.getenv("DB_USER","postgres")
+DB_PASSWORD = os.getenv("DB_PASSWORD", "ben123")
+print(DB_PASSWORD)
