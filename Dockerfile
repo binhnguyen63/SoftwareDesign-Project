@@ -10,6 +10,7 @@
      texlive-latex-base \
      texlive-fonts-recommended \
      ghostscript \
+     postgresql-client \
      && rm -rf /var/lib/apt/lists/*
  
  
