@@ -15,7 +15,7 @@ function addRow() {
   roleCell.innerHTML = `
   <select>
       <option value="admin">Admin</option>
-      <option value="undergraduate-student" selected>basicUser</option>
+      <option value="undergraduate-student" selected>undergraduate-student</option>
       <option value="graduate-student">graduate-student</option>
     </select>
     `;
