@@ -94,12 +94,16 @@ nav a {
 }
 
 #graduate-petition-form,
-#undergraduate-transfer-form {
+#undergraduate-transfer-form,
+#public-info,
+#early_withdrawal {
   cursor: pointer;
 }
 
 #graduate-petition-form:hover,
 #undergraduate-transfer-form:hover,
+#public-info:hover,
+#early_withdrawal:hover,
 .view-submitted-form-btn:hover {
   color: red;
 }

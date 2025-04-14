@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Authorized Early Withdrawal Form</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/early_withdrawal_form.css') }}"
+    />
+    <script
+      src="{{ url_for('static', filename='js/early_withdrawal_form.js') }}"
+      defer
+    ></script>
+  </head>
+  <body>
+    <nav>
+      <div>
+        <a href="{{ url_for('index') }}" class="logo">Home</a>
+        {% if currUser.role == "admin" %}
+        <a href="{{ url_for('admin_dash') }}">Admin Dashboard</a>
+        {% endif %}
+      </div>
+      <span>Welcome, {{ currUser.name }}</span>
+      <a href="{{ url_for('logout') }}" class="btn">Logout</a>
+    </nav>
+    {% if userName and filledFormStatus != "pending" %}
+    <div class="container">
+      <div class="header">
+        <h1>UNIVERSITY of HOUSTON</h1>
+        <h2>AUTHORIZED EARLY WITHDRAWAL FORM</h2>
+      </div>
+
+      <form id="earlyWithdrawalForm">
+        <!-- Personal Information Section -->
+        <div class="form-section">
+          <h3>Student Information</h3>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="first_name">First Name</label>
+              <input
+                type="text"
+                id="first_name"
+                name="first_name"
+                value="{{ userName[0] }}"
+                readonly
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label for="middle_name">Middle Name</label>
+              <input
+                type="text"
+                id="middle_name"
+                name="middle_name"
+                value=""
+                readonly
+              />
+            </div>
+            <div class="form-group">
+              <label for="last_name">Last Name</label>
+              <input
+                type="text"
+                id="last_name"
+                name="last_name"
+                value="{{ userName[1] }}"
+                readonly
+                required
+              />
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="email">Email</label>
+              <input
+                type="email"
+                id="email"
+                name="email"
+                value="{{ currUser.email }}"
+                readonly
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label for="id">SSN or Student ID</label>
+              <input
+                type="text"
+                id="id"
+                name="id"
+                placeholder="{{ record.ID }}"
+                required
+              />
+            </div>
+          </div>
+        </div>
+
+        <!-- Departure Plans Section -->
+        <div class="form-section">
+          <h3>Plans for Departure</h3>
+          <div class="form-group">
+            <label for="step1_option">Step 1: Plans for Departure</label>
+            <select id="step1_option" name="step1_option" required>
+              <option value="">-- Select Your Departure Plan --</option>
+              <option value="1" {% if record.step1_option == "1" %}selected{% endif %}>
+                I am currently enrolled in classes. I will drop all my courses and leave the U.S. within 15 days.
+              </option>
+              <option value="2" {% if record.step1_option == "2" %}selected{% endif %}>
+                I am currently enrolled and will leave the U.S. within 15 days but keep some courses.
+              </option>
+              <option value="3" {% if record.step1_option == "3" %}selected{% endif %}>
+                I am not enrolled (or will unenroll) and will leave the U.S. before the last day to add classes.
+              </option>
+            </select>
+          </div>
+
+          <div id="dropCoursesField" class="hidden">
+            <label for="drop_courses">Enter up to three courses you plan to drop:</label>
+            <div class="form-group">
+              <input
+                type="text"
+                id="drop_course1"
+                name="drop_course1"
+                placeholder="Course 1 (e.g., MATH101)"
+              />
+            </div>
+            <div class="form-group">
+              <input
+                type="text"
+                id="drop_course2"
+                name="drop_course2"
+                placeholder="Course 2 (Optional)"
+              />
+            </div>
+            <div class="form-group">
+              <input
+                type="text"
+                id="drop_course3"
+                name="drop_course3"
+                placeholder="Course 3 (Optional)"
+              />
+            </div>
+          </div>
+        </div>
+
+        <!-- Departure Method Section -->
+        <div class="form-section">
+          <h3>Departure Method</h3>
+          <div class="form-group">
+            <label for="departure_date">Date of Departure</label>
+            <input type="date" id="departure_date" name="departure_date" required />
+          </div>
+          <div class="form-group">
+            <label for="step2_option">How will you depart?</label>
+            <select id="step2_option" name="step2_option" required>
+              <option value="">-- Select Departure Method --</option>
+              <option value="1" {% if record.step2_option == "1" %}selected{% endif %}>
+                I have attached a flight itinerary to verify my departure date.
+              </option>
+              <option value="2" {% if record.step2_option == "2" %}selected{% endif %}>
+                I am driving/have driven across the Canadian or Mexican border.
+              </option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Return Plans Section -->
+        <div class="form-section">
+          <h3>Return Plans</h3>
+          <div class="form-group">
+            <label for="step3_option">Step 3: Return Plans</label>
+            <select id="step3_option" name="step3_option" required>
+              <option value="">-- Select Your Return Plan --</option>
+              <option value="1" {% if record.step3_option == "1" %}selected{% endif %}>
+                I plan to return to the U.S. in a future semester.
+              </option>
+              <option value="2" {% if record.step3_option == "2" %}selected{% endif %}>
+                I do not plan to return to the U.S. to continue my studies.
+              </option>
+            </select>
+          </div>
+          <div id="returnDateField" class="hidden">
+            <label for="return_date">Expected Return Date or Semester:</label>
+            <input type="date" id="return_date" name="return_date" />
+          </div>
+        </div>
+
+        <!-- Acknowledgements Section -->
+        <div class="form-section">
+          <h3>Acknowledgements</h3>
+          <div class="checkbox-group">
+            <input type="checkbox" id="ack1" name="ack1" value="1" required />
+            <label for="ack1">I understand that my current I-20 will be terminated...</label>
+          </div>
+          <div class="checkbox-group">
+            <input type="checkbox" id="ack2" name="ack2" value="1" required />
+            <label for="ack2">I understand that my F-1 “clock” will start over...</label>
+          </div>
+        </div>
+
+        <!-- Signature Section -->
+        <div class="form-section signature-section">
+          <div class="form-group">
+            <label for="signature">Upload Your Signature</label>
+            <input type="file" id="signature" name="signature" accept="image/*" required />
+          </div>
+        </div>
+
+        <button type="submit">Submit</button>
+      </form>
+    </div>
+    {% elif userName and filledFormStatus == "pending" %}
+    <p>YOU ALREADY FILLED OUT THIS FORM - PLEASE WAIT</p>
+    {% endif %}
+  </body>
+</html>
