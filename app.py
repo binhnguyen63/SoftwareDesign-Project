@@ -329,6 +329,15 @@ def returnForm():
     add_or_update_form(returnedFormDetails["email"], returnedFormDetails["form_name"],returnedFormDetails["form_content"],status,returnedFormDetails["user_signature"],returnedFormDetails["approver_signature"],comment)
     return jsonify({"message": "successfully return form"})
 
+@app.route("/public_info")
+def publicInfo():
+    print("Hello, world");
+
+@app.route("/early_withdrawal")
+def earlyWithdrawal():
+    print("Hello, world");
+
+
 @app.route("/undergraduate-transfer-form")
 def undergraduateTransferForm():
     user = session.get("user") 

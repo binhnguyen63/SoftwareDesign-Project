@@ -28,7 +28,9 @@
         <h2>Online Forms</h2>
         <ul>
           <li id="graduate-petition-form">Graduate Student Petition Form</li>
-          <li id="undergraduate-transfer-form">Undergraduate Tranfer Form</li>
+          <li id="undergraduate-transfer-form">Undergraduate Transfer Form</li>
+          <li id="public-info">Request to Withold or Release Public Information</li>
+          <li id="early_withdrawal">Authorized Early Withdrawal Form</li>
         </ul>
       </aside>
 
@@ -64,6 +66,33 @@
         </div>
         <div id="undergraduate-transfer-form-container" class="hidden">
           <h2>Undergraduate Transfer Form</h2>
+          <p>
+            -
+            <a href="{{ url_for('undergraduateTransferForm') }}"
+              >Fill out Form</a
+            >
+          </p>
+          <p>
+            - <span>Form Status:</span>{% set status = false %} {% for formId,
+            formDetails in forms.items() %} {% if formDetails.get("form_name")
+            == "undergraduate transfer form" and not status %} {% set status =
+            true %} {{ formDetails.get("status") }} 
+            {%if formDetails.get("status") == "returned"%}
+            <span> - reason: {{formDetails.get("approver_comment")}} </span>
+            {%endif%}
+            <div>
+              <span> - </span>
+            <a
+              onclick="viewForm('{{formDetails.form_id}}','{{formDetails.email}}')"
+              class="view-submitted-form-btn"
+              >View submitted Form</a
+            >
+            </div>
+            {% endif %} {% endfor %}
+          </p>
+        </div>
+        <div id="early_withdrawal" class="hidden">
+          <h2>Authorized Early Withdrawal Form</h2>
           <p>
             -
             <a href="{{ url_for('undergraduateTransferForm') }}"
