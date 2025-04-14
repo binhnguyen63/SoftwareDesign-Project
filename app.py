@@ -329,15 +329,6 @@ def returnForm():
     add_or_update_form(returnedFormDetails["email"], returnedFormDetails["form_name"],returnedFormDetails["form_content"],status,returnedFormDetails["user_signature"],returnedFormDetails["approver_signature"],comment)
     return jsonify({"message": "successfully return form"})
 
-@app.route("/public_info")
-def publicInfo():
-    print("Hello, world");
-
-@app.route("/early_withdrawal")
-def earlyWithdrawal():
-    print("Hello, world");
-
-
 @app.route("/undergraduate-transfer-form")
 def undergraduateTransferForm():
     user = session.get("user") 
@@ -478,6 +469,27 @@ def show_pdf():
     process = subprocess.run(["make","clean",f"TEX_FILE={file_name}"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     return Response(pdf_output, mimetype="application/pdf")
 
+@app.route("/public-info-form")
+def render_public_info_form():
+    user = session.get("user")
+    userinfo = None
+    record = {}
+    if user:
+        userinfo = getUserInfo(user['email'])
+        # You may query past submission if needed
+    return render_template("forms/public_info_form.html", user=userinfo, record=record)
+
+@app.route("/early-withdrawal-form")
+def render_early_withdrawal_form():
+    user = session.get("user")
+    userinfo = None
+    record = {}
+    if user:
+        userinfo = getUserInfo(user['email'])
+        # You may query past submission if needed
+    return render_template("forms/early_withdrawal_form.html", user=userinfo, record=record)
+
+
 
 if __name__ == "__main__":
     # Suppress Flask's default logging
@@ -489,4 +501,5 @@ if __name__ == "__main__":
     
     # Run the app
     app.run(host='0.0.0.0', port=app_config.PORT, use_reloader=False)
+
     
