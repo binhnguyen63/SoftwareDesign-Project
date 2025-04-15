@@ -348,14 +348,18 @@ def render_public_info_form():
     user = session.get("user")
     userinfo = None
     record = {}
+    userName = None
+    filledFormStatus = ""
+
     if user:
         userinfo = getUserInfo(user['email'])
         userName = user.get('name').split(',')
         filledForm = getFormByEmailAndName(user.get("email"), "public info form")
         if filledForm:
             filledFormStatus = filledForm.get("status")
-        #record = getFormByEmailAndName(user['email'], "public info form") or {}
-    return render_template("forms/public_info.html", userName=userName, currUser=userinfo, record=record)
+    
+    return render_template("forms/public_info.html", userName=userName, currUser=userinfo, record=record, filledFormStatus=filledFormStatus)
+
 
 
 @app.route("/early-withdrawal-form")
@@ -363,13 +367,18 @@ def early_withdrawal_form():
     user = session.get("user")
     userinfo = None
     record = {}
+    userName = None
+    filledFormStatus = None
+
     if user:
         userinfo = getUserInfo(user.get("email"))
         userName = user.get('name').split(',')
         filledForm = getFormByEmailAndName(user.get("email"), "early withdrawal form")
         if filledForm:
             filledFormStatus = filledForm.get("status")
-    return render_template("forms/early_withdrawal_form.html", userName=userName, currUser=userinfo, record=record)
+
+    return render_template("forms/early_withdrawal_form.html", userName=userName, currUser=userinfo, record=record, filledFormStatus=filledFormStatus)
+
 
 
 @app.route('/approve-deny-form', methods=['POST'])
@@ -448,6 +457,40 @@ def update_latex():
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+    
+@app.route("/submit-public-info-js", methods=["POST"])
+def submit_public_info_js():
+    user = session.get("user")
+    if not user or "email" not in user:
+        return jsonify({"error": "User not authenticated"}), 401
+
+    data = request.get_json()
+    form_name = "public info form"  # hardcoded to prevent mismatch
+    form_content = data.get("content")
+    signature_base64 = data.get("signature")
+
+    if not form_content:
+        return jsonify({"error": "Missing LaTeX content"}), 400
+
+    # Convert signature to binary
+    try:
+        signature_binary = base64.b64decode(signature_base64.split(",")[1]) if signature_base64 else None
+    except Exception:
+        return jsonify({"error": "Invalid signature format"}), 400
+
+    # Save to database
+    add_or_update_form(
+        email=user["email"],
+        form_name=form_name,
+        form_content=form_content,
+        status="pending",
+        user_signature=signature_binary,
+        approver_signature=None,
+        approver_comment=""
+    )
+
+    return jsonify({"message": "Form saved successfully!"})
+
 
 @app.route("/show_pdf", methods=["POST"])
 def show_pdf():
