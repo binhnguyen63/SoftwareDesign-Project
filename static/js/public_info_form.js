@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Request to Withhold or Release Public Information</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/public_info_form.css') }}" />
+  <script src="{{ url_for('static', filename='js/public_info_form.js') }}" defer></script>
+</head>
+<body>
+  <nav>
+    <div>
+      <a href="{{ url_for('index') }}" class="logo">Home</a>
+      {% if currUser.role == "admin" %}
+      <a href="{{ url_for('admin_dash') }}">Admin Dashboard</a>
+      {% endif %}
+    </div>
+    <span>Welcome, {{ currUser.name }}</span>
+    <a href="{{ url_for('logout') }}" class="btn">Logout</a>
+  </nav>
+
+  {% if userName and filledFormStatus != "pending" %}
+  <div class="container">
+    <div class="header">
+      <h1>UNIVERSITY of HOUSTON</h1>
+      <h2>REQUEST TO WITHHOLD OR RELEASE PUBLIC INFORMATION</h2>
+    </div>
+
+    <form id="publicInfoForm" enctype="multipart/form-data">
+      <!-- Personal Information Section -->
+      <div class="form-section">
+        <h3>Student Information</h3>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="full_name">Full Name</label>
+            <input type="text" id="full_name" name="full_name" value="{{ userName[0] }} {{ userName[1] }}" readonly required />
+          </div>
+          <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" value="{{ currUser.email }}" readonly required />
+          </div>
+          <div class="form-group">
+            <label for="id">SSN or Student ID</label>
+            <input
+              type="text"
+              id="id"
+              name="id"
+              value="{{ record.ID if record.ID is defined else '' }}"
+              required
+            />
+          </div>
+        </div>
+      </div>
+
+      <!-- Request Type Section -->
+      <div class="form-section">
+        <h3>Request Type</h3>
+        <div class="form-group">
+          <label for="request_type">Select Request Type</label>
+          <select id="request_type" name="request_type" required>
+            <option value="">-- Select --</option>
+            <option value="A" {% if record.option == "A" %}selected{% endif %}>
+              I request that my public information NOT be released
+            </option>
+            <option value="B" {% if record.option == "B" %}selected{% endif %}>
+              I am terminating my previous request and allow the release
+            </option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Signature Section -->
+      <div class="form-section signature-section">
+        <div class="form-group">
+          <label for="signature">Upload Your Signature</label>
+          <input type="file" id="signature" name="signature" accept="image/*" required />
+        </div>
+      </div>
+
+      <button type="submit">Submit</button>
+    </form>
+  </div>
+  {% endif %}
+
+  {% if userName and filledFormStatus == "pending" %}
+  <p>YOU ALREADY FILLED OUT THIS FORM - PLEASE WAIT</p>
+  {% endif %}
+</body>
+</html>
