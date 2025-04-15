@@ -32,6 +32,8 @@ document
     document
       .getElementById("undergraduate-transfer-form-container")
       .classList.add("hidden");
+    document.getElementById("public-info-container").classList.add("hidden");
+    document.getElementById("early_withdrawal-container").classList.add("hidden");
   });
 
 document
@@ -43,8 +45,36 @@ document
     document
       .getElementById("undergraduate-transfer-form-container")
       .classList.remove("hidden");
+    document.getElementById("public-info-container").classList.add("hidden");
+    document.getElementById("early_withdrawal-container").classList.add("hidden");
   });
-1;
+
+document
+  .getElementById("public-info")
+  .addEventListener("click", () => {
+    document
+      .getElementById("graduate-petition-form-container")
+      .classList.add("hidden");
+    document
+      .getElementById("undergraduate-transfer-form-container")
+      .classList.add("hidden");
+    document.getElementById("public-info-container").classList.remove("hidden");
+    document.getElementById("early_withdrawal-container").classList.add("hidden");
+  });
+
+document
+  .getElementById("early_withdrawal")
+  .addEventListener("click", () => {
+    document
+      .getElementById("graduate-petition-form-container")
+      .classList.add("hidden");
+    document
+      .getElementById("undergraduate-transfer-form-container")
+      .classList.add("hidden");
+    document.getElementById("public-info-container").classList.add("hidden");
+    document.getElementById("early_withdrawal-container").classList.remove("hidden");
+  });
+
 function viewForm(formId, userEmail) {
   event.preventDefault();
   fetch("/show_pdf", {

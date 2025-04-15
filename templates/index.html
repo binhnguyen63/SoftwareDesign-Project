@@ -29,91 +29,107 @@
         <ul>
           <li id="graduate-petition-form">Graduate Student Petition Form</li>
           <li id="undergraduate-transfer-form">Undergraduate Transfer Form</li>
-          <li id="public-info">Request to Withold or Release Public Information</li>
+          <li id="public-info">Request to Withhold or Release Public Information</li>
           <li id="early_withdrawal">Authorized Early Withdrawal Form</li>
         </ul>
       </aside>
 
       <section class="form-details">
+        <!-- Graduate Student Petition Form -->
         <div id="graduate-petition-form-container">
           <h2>Graduate Student Petition Form</h2>
           <p>
-            -
-            <a href="{{ url_for('handleGraduateStudentPetitionForm') }}"
-              >Fill out Form</a
-            >
+            - <a href="{{ url_for('handleGraduateStudentPetitionForm') }}">Fill out Form</a>
           </p>
           <p>
-            - <span>Form Status:</span>{% set status = false %} {% for
-            formId,formDetails in forms.items() %} {% if
-            formDetails.get("form_name") == "graduate student petition form" and
-            not status %} {% set status = true %} {{ formDetails.get("status")
-            }}
-            {%if formDetails.get("status") == "returned"%}
-            <span> - reason: {{formDetails.get("approver_comment")}} </span>
-            {%endif%}
+            - <span>Form Status:</span>{% set status = false %} {% for formId, formDetails in forms.items() %}
+            {% if formDetails.get("form_name") == "graduate student petition form" and not status %}
+            {% set status = true %} {{ formDetails.get("status") }}
+            {% if formDetails.get("status") == "returned" %}
+            <span> - reason: {{ formDetails.get("approver_comment") }} </span>
+            {% endif %}
             <div>
               <span> - </span>
               <a
-              onclick="viewForm('{{formDetails.form_id}}','{{formDetails.email}}')"
-              class="view-submitted-form-btn"
-              >View submitted Form</a
-            >
+                onclick="viewForm('{{ formDetails.form_id }}','{{ formDetails.email }}')"
+                class="view-submitted-form-btn"
+                >View submitted Form</a
+              >
             </div>
-
             {% endif %} {% endfor %}
           </p>
         </div>
+
+        <!-- Undergraduate Transfer Form -->
         <div id="undergraduate-transfer-form-container" class="hidden">
           <h2>Undergraduate Transfer Form</h2>
           <p>
-            -
-            <a href="{{ url_for('undergraduateTransferForm') }}"
-              >Fill out Form</a
-            >
+            - <a href="{{ url_for('undergraduateTransferForm') }}">Fill out Form</a>
           </p>
           <p>
-            - <span>Form Status:</span>{% set status = false %} {% for formId,
-            formDetails in forms.items() %} {% if formDetails.get("form_name")
-            == "undergraduate transfer form" and not status %} {% set status =
-            true %} {{ formDetails.get("status") }} 
-            {%if formDetails.get("status") == "returned"%}
-            <span> - reason: {{formDetails.get("approver_comment")}} </span>
-            {%endif%}
+            - <span>Form Status:</span>{% set status = false %} {% for formId, formDetails in forms.items() %}
+            {% if formDetails.get("form_name") == "undergraduate transfer form" and not status %}
+            {% set status = true %} {{ formDetails.get("status") }}
+            {% if formDetails.get("status") == "returned" %}
+            <span> - reason: {{ formDetails.get("approver_comment") }} </span>
+            {% endif %}
             <div>
               <span> - </span>
-            <a
-              onclick="viewForm('{{formDetails.form_id}}','{{formDetails.email}}')"
-              class="view-submitted-form-btn"
-              >View submitted Form</a
-            >
+              <a
+                onclick="viewForm('{{ formDetails.form_id }}','{{ formDetails.email }}')"
+                class="view-submitted-form-btn"
+                >View submitted Form</a
+              >
             </div>
             {% endif %} {% endfor %}
           </p>
         </div>
-        <div id="early_withdrawal" class="hidden">
-          <h2>Authorized Early Withdrawal Form</h2>
+
+        <!-- Public Info Form -->
+        <div id="public-info-container" class="hidden">
+          <h2>Request to Withhold or Release Public Information</h2>
           <p>
-            -
-            <a href="{{ url_for('undergraduateTransferForm') }}"
-              >Fill out Form</a
-            >
+            - <a href="{{ url_for('render_public_info_form') }}">Fill out Form</a>
           </p>
           <p>
-            - <span>Form Status:</span>{% set status = false %} {% for formId,
-            formDetails in forms.items() %} {% if formDetails.get("form_name")
-            == "undergraduate transfer form" and not status %} {% set status =
-            true %} {{ formDetails.get("status") }} 
-            {%if formDetails.get("status") == "returned"%}
-            <span> - reason: {{formDetails.get("approver_comment")}} </span>
-            {%endif%}
+            - <span>Form Status:</span>{% set status = false %} {% for formId, formDetails in forms.items() %}
+            {% if formDetails.get("form_name") == "public info form" and not status %}
+            {% set status = true %} {{ formDetails.get("status") }}
+            {% if formDetails.get("status") == "returned" %}
+            <span> - reason: {{ formDetails.get("approver_comment") }} </span>
+            {% endif %}
             <div>
               <span> - </span>
-            <a
-              onclick="viewForm('{{formDetails.form_id}}','{{formDetails.email}}')"
-              class="view-submitted-form-btn"
-              >View submitted Form</a
-            >
+              <a
+                onclick="viewForm('{{ formDetails.form_id }}','{{ formDetails.email }}')"
+                class="view-submitted-form-btn"
+                >View submitted Form</a
+              >
+            </div>
+            {% endif %} {% endfor %}
+          </p>
+        </div>
+
+        <!-- Early Withdrawal Form -->
+        <div id="early_withdrawal-container" class="hidden">
+          <h2>Authorized Early Withdrawal Form</h2>
+          <p>
+            - <a href="{{ url_for('early_withdrawal_form') }}">Fill out Form</a>
+          </p>
+          <p>
+            - <span>Form Status:</span>{% set status = false %} {% for formId, formDetails in forms.items() %}
+            {% if formDetails.get("form_name") == "early withdrawal form" and not status %}
+            {% set status = true %} {{ formDetails.get("status") }}
+            {% if formDetails.get("status") == "returned" %}
+            <span> - reason: {{ formDetails.get("approver_comment") }} </span>
+            {% endif %}
+            <div>
+              <span> - </span>
+              <a
+                onclick="viewForm('{{ formDetails.form_id }}','{{ formDetails.email }}')"
+                class="view-submitted-form-btn"
+                >View submitted Form</a
+              >
             </div>
             {% endif %} {% endfor %}
           </p>

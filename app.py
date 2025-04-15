@@ -342,6 +342,36 @@ def undergraduateTransferForm():
         filledFormStatus = filledForm.get("status")
     return render_template("forms/undergraduate_transfer_form.html",userName=userName,currUser=userinfo,filledFormStatus=filledFormStatus)
 
+
+@app.route("/public-info-form")
+def render_public_info_form():
+    user = session.get("user")
+    userinfo = None
+    record = {}
+    if user:
+        userinfo = getUserInfo(user['email'])
+        userName = user.get('name').split(',')
+        filledForm = getFormByEmailAndName(user.get("email"), "public info form")
+        if filledForm:
+            filledFormStatus = filledForm.get("status")
+        #record = getFormByEmailAndName(user['email'], "public info form") or {}
+    return render_template("forms/public_info.html", userName=userName, currUser=userinfo, record=record)
+
+
+@app.route("/early-withdrawal-form")
+def early_withdrawal_form():
+    user = session.get("user")
+    userinfo = None
+    record = {}
+    if user:
+        userinfo = getUserInfo(user.get("email"))
+        userName = user.get('name').split(',')
+        filledForm = getFormByEmailAndName(user.get("email"), "early withdrawal form")
+        if filledForm:
+            filledFormStatus = filledForm.get("status")
+    return render_template("forms/early_withdrawal_form.html", userName=userName, currUser=userinfo, record=record)
+
+
 @app.route('/approve-deny-form', methods=['POST'])
 def approve_deny_form():
     try:
@@ -469,25 +499,7 @@ def show_pdf():
     process = subprocess.run(["make","clean",f"TEX_FILE={file_name}"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     return Response(pdf_output, mimetype="application/pdf")
 
-@app.route("/public-info-form")
-def render_public_info_form():
-    user = session.get("user")
-    userinfo = None
-    record = {}
-    if user:
-        userinfo = getUserInfo(user['email'])
-        # You may query past submission if needed
-    return render_template("forms/public_info_form.html", user=userinfo, record=record)
 
-@app.route("/early-withdrawal-form")
-def render_early_withdrawal_form():
-    user = session.get("user")
-    userinfo = None
-    record = {}
-    if user:
-        userinfo = getUserInfo(user['email'])
-        # You may query past submission if needed
-    return render_template("forms/early_withdrawal_form.html", user=userinfo, record=record)
 
 
 
