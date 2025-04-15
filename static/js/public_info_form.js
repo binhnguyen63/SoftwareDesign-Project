@@ -1,89 +1,98 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Request to Withhold or Release Public Information</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/public_info_form.css') }}" />
-  <script src="{{ url_for('static', filename='js/public_info_form.js') }}" defer></script>
-</head>
-<body>
-  <nav>
-    <div>
-      <a href="{{ url_for('index') }}" class="logo">Home</a>
-      {% if currUser.role == "admin" %}
-      <a href="{{ url_for('admin_dash') }}">Admin Dashboard</a>
-      {% endif %}
-    </div>
-    <span>Welcome, {{ currUser.name }}</span>
-    <a href="{{ url_for('logout') }}" class="btn">Logout</a>
-  </nav>
+// Signature preview (optional canvas)
+document.getElementById("signature").addEventListener("change", function (event) {
+  const file = event.target.files[0];
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = function (e) {
+      const img = new Image();
+      img.onload = function () {
+        const canvas = document.createElement("canvas");
+        canvas.width = 300;
+        canvas.height = 100;
+        const ctx = canvas.getContext("2d");
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        canvas.dataset.signature = e.target.result;
+        document.body.appendChild(canvas); // Optional visual preview
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  }
+});
 
-  {% if userName and filledFormStatus != "pending" %}
-  <div class="container">
-    <div class="header">
-      <h1>UNIVERSITY of HOUSTON</h1>
-      <h2>REQUEST TO WITHHOLD OR RELEASE PUBLIC INFORMATION</h2>
-    </div>
+// LaTeX content builder
+function generateLaTeX_PublicInfo(studentId, requestType) {
+  const fullName = document.getElementById("full_name").value;
+  const email = document.getElementById("email").value;
 
-    <form id="publicInfoForm" enctype="multipart/form-data">
-      <!-- Personal Information Section -->
-      <div class="form-section">
-        <h3>Student Information</h3>
-        <div class="form-row">
-          <div class="form-group">
-            <label for="full_name">Full Name</label>
-            <input type="text" id="full_name" name="full_name" value="{{ userName[0] }} {{ userName[1] }}" readonly required />
-          </div>
-          <div class="form-group">
-            <label for="email">Email</label>
-            <input type="email" id="email" name="email" value="{{ currUser.email }}" readonly required />
-          </div>
-          <div class="form-group">
-            <label for="id">SSN or Student ID</label>
-            <input
-              type="text"
-              id="id"
-              name="id"
-              value="{{ record.ID if record.ID is defined else '' }}"
-              required
-            />
-          </div>
-        </div>
-      </div>
+  return `
+  \\documentclass{article}
+  \\usepackage{geometry}
+  \\usepackage{graphicx}
+  \\geometry{margin=1in}
+  \\begin{document}
 
-      <!-- Request Type Section -->
-      <div class="form-section">
-        <h3>Request Type</h3>
-        <div class="form-group">
-          <label for="request_type">Select Request Type</label>
-          <select id="request_type" name="request_type" required>
-            <option value="">-- Select --</option>
-            <option value="A" {% if record.option == "A" %}selected{% endif %}>
-              I request that my public information NOT be released
-            </option>
-            <option value="B" {% if record.option == "B" %}selected{% endif %}>
-              I am terminating my previous request and allow the release
-            </option>
-          </select>
-        </div>
-      </div>
+  \\title{Request to Withhold or Release Public Information}
+  \\maketitle
 
-      <!-- Signature Section -->
-      <div class="form-section signature-section">
-        <div class="form-group">
-          <label for="signature">Upload Your Signature</label>
-          <input type="file" id="signature" name="signature" accept="image/*" required />
-        </div>
-      </div>
+  \\section*{Student Information}
+  Full Name: ${fullName} \\\\
+  Email: ${email} \\\\
+  SSN or Student ID: ${studentId} \\\\
 
-      <button type="submit">Submit</button>
-    </form>
-  </div>
-  {% endif %}
+  \\section*{Request Type}
+  ${requestType === "A" ? "I request that my public information NOT be released." : "I am terminating my previous request and allow the release."} \\\\
 
-  {% if userName and filledFormStatus == "pending" %}
-  <p>YOU ALREADY FILLED OUT THIS FORM - PLEASE WAIT</p>
-  {% endif %}
-</body>
-</html>
+  \\section*{Signature}
+  \\includegraphics[width=7cm]{signature.png}
+
+  \\end{document}
+  `;
+}
+
+// Form submission
+document.getElementById("publicInfoForm").addEventListener("submit", async function (event) {
+  event.preventDefault();
+
+  const studentId = document.getElementById("id").value;
+  const requestType = document.getElementById("request_type").value;
+  const texContent = generateLaTeX_PublicInfo(studentId, requestType);
+
+  const fileInput = document.getElementById("signature");
+  const file = fileInput.files[0];
+
+  let signatureBase64 = "";
+  if (file) {
+    signatureBase64 = await new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  }
+
+  try {
+    const response = await fetch("/submit-public-info-js", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        formName: "public info form",
+        content: texContent,
+        signature: signatureBase64,
+        id: studentId,
+        option: requestType,
+      }),
+    });
+
+    if (response.ok) {
+      alert("Form submitted successfully!");
+      window.location.href = "/public-info-form";
+    } else {
+      alert("Submission failed.");
+    }
+  } catch (err) {
+    console.error("Submission error:", err);
+    alert("An error occurred during submission.");
+  }
+});
