@@ -91,25 +91,28 @@
           <p>
             - <a href="{{ url_for('render_public_info_form') }}">Fill out Form</a>
           </p>
-          <p>
-            - <span>Form Status:</span>{% set status = false %} {% for formId, formDetails in forms.items() %}
-            {% if formDetails.get("form_name") == "public info form" and not status %}
-            {% set status = true %} {{ formDetails.get("status") }}
-            {% if formDetails.get("status") == "returned" %}
-            <span> - reason: {{ formDetails.get("approver_comment") }} </span>
+          {% set status = false %}
+          {% for formId, formDetails in forms.items() %}
+            {% if formDetails.form_name.lower() == "public info form" and not status %}
+              {% set status = true %}
+              <p> - Form Status: {{ formDetails.status }}</p>
+              {% if formDetails.status == "returned" %}
+                <p> - reason: {{ formDetails.approver_comment }}</p>
+              {% endif %}
+              <div>
+                <span> - </span>
+                <a
+                  onclick="viewForm('{{ formDetails.form_id }}','{{ formDetails.email }}')"
+                  class="view-submitted-form-btn"
+                >View submitted Form</a>
+              </div>
             {% endif %}
-            <div>
-              <span> - </span>
-              <a
-                onclick="viewForm('{{ formDetails.form_id }}','{{ formDetails.email }}')"
-                class="view-submitted-form-btn"
-                >View submitted Form</a
-              >
-            </div>
-            {% endif %} {% endfor %}
-          </p>
+          {% endfor %}
+          {% if not status %}
+            <p> - Form Status: Not submitted</p>
+          {% endif %}
         </div>
-
+        
         <!-- Early Withdrawal Form -->
         <div id="early_withdrawal-container" class="hidden">
           <h2>Authorized Early Withdrawal Form</h2>
