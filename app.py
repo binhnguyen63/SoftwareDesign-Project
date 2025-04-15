@@ -477,6 +477,39 @@ def submit_public_info_js():
         signature_binary = base64.b64decode(signature_base64.split(",")[1]) if signature_base64 else None
     except Exception:
         return jsonify({"error": "Invalid signature format"}), 400
+    
+    
+@app.route("/submit-early-withdrawal-js", methods=["POST"])
+def submit_early_withdrawal_js():
+    user = session.get("user")
+    if not user or "email" not in user:
+        return jsonify({"error": "User not authenticated"}), 401
+
+    data = request.get_json()
+    form_name = "early withdrawal form"
+    form_content = data.get("content")
+    signature_base64 = data.get("signature")
+
+    if not form_content:
+        return jsonify({"error": "Missing LaTeX content"}), 400
+
+    try:
+        signature_binary = base64.b64decode(signature_base64.split(",")[1]) if signature_base64 else None
+    except Exception:
+        return jsonify({"error": "Invalid signature format"}), 400
+
+    add_or_update_form(
+        email=user["email"],
+        form_name=form_name,
+        form_content=form_content,
+        status="pending",
+        user_signature=signature_binary,
+        approver_signature=None,
+        approver_comment=""
+    )
+
+    return jsonify({"message": "Early withdrawal form saved successfully!"})
+
 
     # Save to database
     add_or_update_form(
