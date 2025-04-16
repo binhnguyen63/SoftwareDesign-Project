@@ -329,6 +329,30 @@ def returnForm():
     add_or_update_form(returnedFormDetails["email"], returnedFormDetails["form_name"],returnedFormDetails["form_content"],status,returnedFormDetails["user_signature"],returnedFormDetails["approver_signature"],comment)
     return jsonify({"message": "successfully return form"})
 
+
+@app.route("/delete_form/<int:form_id>", methods=["DELETE"])
+def delete_form(form_id):
+    try:
+        print(f"DELETE request received for form_id: {form_id}")
+
+        # Check if form exists first
+        forms = getTable("forms")
+        if form_id not in forms:
+            return jsonify({"error": "Form not found"}), 404
+
+        # Delete the form
+        delete_query = "DELETE FROM forms WHERE form_id = %s;"
+        g.db_cursor.execute(delete_query, (form_id,))
+        g.db_conn.commit()
+
+        print(f"Form {form_id} deleted successfully.")
+        return '', 204  # No Content
+    except Exception as e:
+        print(f"Error during deletion: {e}")
+        return jsonify({"error": "Internal server error", "details": str(e)}), 500
+
+
+
 @app.route("/undergraduate-transfer-form")
 def undergraduateTransferForm():
     user = session.get("user") 

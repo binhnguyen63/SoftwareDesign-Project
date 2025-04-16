@@ -346,3 +346,64 @@ async function submitRequestInfo() {
     console.error("Request failed - return file to request more info", error);
   }
 }
+
+
+
+let formIdToDelete = null;
+
+// Opens the delete confirmation modal
+function deleteForm(formId) {
+  formIdToDelete = formId;
+  const modal = document.getElementById("delete-modal");
+  if (modal) {
+    modal.style.display = "block";
+  }
+}
+
+// Closes the modal
+function closeDeleteModal() {
+  const modal = document.getElementById("delete-modal");
+  if (modal) {
+    modal.style.display = "none";
+  }
+  formIdToDelete = null;
+}
+
+// Executes once the DOM is ready
+document.addEventListener("DOMContentLoaded", function () {
+  const confirmDeleteBtn = document.getElementById("confirm-delete-btn");
+  if (confirmDeleteBtn) {
+    confirmDeleteBtn.addEventListener("click", function () {
+      if (!formIdToDelete) return;
+      console.log("Confirm delete button clicked for form ID:", formIdToDelete);
+
+      fetch(`/delete_form/${formIdToDelete}`, {
+        method: 'DELETE'
+      })
+        .then((response) => {
+          if (response.ok) {
+            alert("Form deleted successfully.");
+            location.reload();
+          } else {
+            alert("Failed to delete the form.");
+          }
+        })
+        .catch((error) => {
+          console.error("Error:", error);
+          alert("An error occurred while deleting the form.");
+        })
+        .finally(() => {
+          closeDeleteModal();
+        });
+    });
+  }
+
+  // Optional: clicking outside modal closes it
+  window.onclick = function (event) {
+    const modal = document.getElementById("delete-modal");
+    if (event.target === modal) {
+      closeDeleteModal();
+    }
+  };
+});
+

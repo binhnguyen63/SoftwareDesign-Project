@@ -81,6 +81,7 @@
             <th>Status</th>
             <th>Action</th>
             <th>Admin Approval Signature </th>
+            <th>Delete Form </th>
           </tr>
           {%for formId,formDetails in forms.items()%}
           <tr>
@@ -103,6 +104,10 @@
             </td>
             <td>
               <img src="data:image/png;base64,{{formDetails.approver_signature}}" width="50">
+            </td>
+
+            <td>
+              <button class="alterbtn btn-danger" onclick="deleteForm('{{ formDetails.form_id }}')">Delete</button>
             </td>
           </tr>
           {%endfor%}
@@ -131,6 +136,17 @@
                 <button type="submit">Submit Approval</button>
             </form>
         </div>
+
+    </div>
+    
+    <div id="delete-modal" class="modal">
+      <div class="modal-content">
+        <span class="close" onclick="closeDeleteModal()">&times;</span>
+        <h2>Delete Form</h2>
+        <p>Are you sure you want to permanently delete this form?</p>
+        <button class="alterbtn btn-danger" id="confirm-delete-btn">Yes, Delete</button>
+        <button class="alterbtn" onclick="closeDeleteModal()">Cancel</button>
+      </div>
     </div>
     </div>
 
