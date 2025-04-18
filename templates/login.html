@@ -2,22 +2,19 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <title>Microsoft Identity Python Web App: Login</title>
+    <title>Login</title>
+
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/login.css') }}"
+    />
   </head>
   <body>
-    <h1>Microsoft Identity Python Web App</h1>
-
-    <ul>
-      <li><a href="{{ url_for('login') }}">Sign In with Microsoft</a></li>
-    </ul>
-    {% if config.get("B2C_RESET_PASSWORD_AUTHORITY") %}
-    <a
-      href="{{ config.get('B2C_RESET_PASSWORD_AUTHORITY') }}?client_id={{ config.get('CLIENT_ID') }}"
-      >Reset Password</a
-    >
-    {% endif %}
-
-    <hr />
-    <footer style="text-align: right">Powered by Microsoft Graph API</footer>
+    <h1>Login with your CougarID</h1>
+    <form method="POST" action="{{ url_for('login') }}">
+      <label for="cougarid">CougarID:</label>
+      <input type="text" id="cougarid" name="cougarid" required />
+      <button type="submit">Login</button>
+    </form>
   </body>
 </html>

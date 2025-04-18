@@ -21,7 +21,8 @@ CREATE TABLE IF NOT EXISTS users (
     email VARCHAR(255) PRIMARY KEY,
     name VARCHAR(255),
     role VARCHAR(255),
-    account_status BOOLEAN
+    account_status BOOLEAN,
+    cougarid VARCHAR(255)
 );
 
 CREATE TABLE IF NOT EXISTS forms (
@@ -36,15 +37,18 @@ CREATE TABLE IF NOT EXISTS forms (
     CONSTRAINT unique_email_form_name UNIQUE (email, form_name)
 );
 
-INSERT INTO users (email, name, role, account_status)
+INSERT INTO users (email, name, role, account_status, cougarid)
 VALUES 
-    (LOWER('tbnguy36@CougarNet.UH.EDU'), 'Nguyen, Binh', 'admin', TRUE),
-    (LOWER('fmmancil@cougarnet.uh.edu'), 'Mancilla, Fernando', 'admin', TRUE),
-    (LOWER('rlpham3@cougarnet.uh.edu'), 'Pham, Ryan', 'admin', TRUE),
-    (LOWER('john.doe@CougarNet.UH.EDU'), 'John Doe', 'undergraduate-student', TRUE),
-    (LOWER('jane.smith@CougarNet.UH.EDU'), 'Jane Smith', 'undergraduate-student', FALSE),
-    (LOWER('alice.johnson@CougarNet.UH.EDU'), 'Alice Johnson', 'graduate-student', TRUE),
-    (LOWER('bob.williams@CougarNet.UH.EDU'), 'Bob Williams', 'graduate-student', FALSE)
+    (LOWER('tbnguy36@CougarNet.UH.EDU'), 'Nguyen, Binh', 'admin', TRUE, 1234567),
+    (LOWER('fmmancil@cougarnet.uh.edu'), 'Mancilla, Fernando', 'admin', TRUE, 1942752),
+    (LOWER('rlpham3@cougarnet.uh.edu'), 'Pham, Ryan', 'admin', TRUE, 5555555),
+    (LOWER('john.doe@CougarNet.UH.EDU'), 'John Doe', 'undergraduate-student', TRUE, 7654321),
+    (LOWER('jane.smith@CougarNet.UH.EDU'), 'Jane Smith', 'undergraduate-student', FALSE, 3214567),
+    (LOWER('alice.johnson@CougarNet.UH.EDU'), 'Alice Johnson', 'graduate-student', TRUE, 9803461),
+    (LOWER('bob.williams@CougarNet.UH.EDU'), 'Bob Williams', 'graduate-student', FALSE, 4321543),
+    (LOWER('test.bruh@CougarNet.UH.EDU'), 'Bruh New', 'delegate', TRUE, 1235609),
+    (LOWER('alex.manuel@CougarNet.UH.EDU'), 'Alex Manuel', 'undergraduate-student', FALSE, 4205412)
+    
 ON CONFLICT (email) DO NOTHING;
 
 """
@@ -58,7 +62,7 @@ def save_signature(base64_str):
 def get_user_by_email(email):
     if not email:
         return None
-    g.db_cursor.execute("SELECT email, name, role, account_status FROM users WHERE email = %s", (email,))
+    g.db_cursor.execute("SELECT email, name, role, account_status, cougarid FROM users WHERE email = %s", (email,))
     user = g.db_cursor.fetchone()
 
     if user:
@@ -67,8 +71,25 @@ def get_user_by_email(email):
             "name": user[1],
             "role": user[2],
             "account_status": user[3],
+            "cougarid": user[4],
         }
-    return None 
+    return None
+
+def get_user_by_cougarid(cougarid):
+    if not cougarid:
+        return None
+    g.db_cursor.execute("SELECT email, name, role, account_status, cougarid FROM users WHERE cougarid = %s", (cougarid,))
+    user = g.db_cursor.fetchone()
+
+    if user:
+        return {
+            "email": user[0],
+            "name": user[1],
+            "role": user[2],
+            "account_status": user[3],
+            "cougarid": user[4],
+        }
+    return None
 
 @app.before_request
 def before_request():
@@ -143,18 +164,33 @@ def add_or_update_form(email, form_name, form_content, status, user_signature, a
         g.db_conn.rollback()
         print("Error:", e)
 
-# Microsoft Login URL
-@app.route("/login")
+# Login Route
+@app.route("/login", methods=["POST", "GET"])
 def login():
-    auth_url = f"{app_config.AUTHORITY}/oauth2/v2.0/authorize?"
-    auth_params = {
-        'client_id': app_config.CLIENT_ID,
-        'response_type': 'code',
-        'redirect_uri': url_for('auth_response', _external=True),
-        'scope': ' '.join(app_config.SCOPE),
-        'state': '12345'
-    }
-    return redirect(auth_url + urlencode(auth_params))
+    if request.method == "POST":
+        cougarid = request.form.get("cougarid")  # Get CougarID from the form
+        if not cougarid:
+            return "Error: CougarID is required", 400
+
+        # Validate CougarID in the database
+        g.db_cursor.execute("SELECT * FROM users WHERE cougarid = %s", (cougarid,))
+        user = g.db_cursor.fetchone()
+
+        if not user:
+            return "Error: Invalid CougarID", 403
+
+        # Store user information in the session
+        session['user'] = {
+            "email": user[0],
+            "name": user[1],
+            "role": user[2],
+            "account_status": user[3],
+            "cougarid": cougarid,
+        }
+        return redirect(url_for('index'))
+
+    # Render a simple login form
+    return render_template("login.html")
 
 @app.route("/add_user", methods=["POST"])
 def add_user():
@@ -162,15 +198,16 @@ def add_user():
     email = data.get("email").lower()
     name = data.get("name")
     role = data.get("role", "undergraduate-student")
-    account_status = data.get("account_status", True) 
+    account_status = data.get("account_status", True)
+    cougarid = data.get("cougarid", 0000000)
     user = getUserInfo(email)
     if user:
         if not user.get("account_status"):
             return jsonify({"error": "User is deactivated."}), 401
     if not user:
         g.db_cursor.execute(
-            "INSERT INTO users (email, name, role, account_status) VALUES (%s, %s, %s, %s) ON CONFLICT (email) DO NOTHING",
-            (email, name, role, account_status),
+            "INSERT INTO users (email, name, role, account_status, cougarid) VALUES (%s, %s, %s, %s) ON CONFLICT (email) DO NOTHING",
+            (email, name, role, account_status, cougarid),
         )
         g.db_conn.commit()
 
@@ -185,16 +222,17 @@ def update_user():
         new_name = user_data.get("name")
         new_role = user_data.get("role")
         new_status = user_data.get("account_status")
+        new_cougarid = user_data.get("cougarid")
         if user_data.get("account_status") == "True":
             new_status = True
         else:
             new_status = False
         query = """
             UPDATE users 
-            SET name = %s, role = %s, account_status = %s 
+            SET name = %s, role = %s, account_status = %s, cougarid = %s
             WHERE email = %s
         """
-        g.db_cursor.execute(query, (new_name, new_role, new_status, email))
+        g.db_cursor.execute(query, (new_name, new_role, new_status, new_cougarid, email))
         g.db_conn.commit()
 
     return {"message": "User information updated successfully"}, 200
@@ -241,15 +279,21 @@ def auth_response():
         headers = {'Authorization': f'Bearer {access_token}'}
         user_info = requests.get(graph_url, headers=headers).json()
 
+        user_email = user_info.get('userPrincipalName').lower()
+
+        # Restrict login to CougarNet IDs
+        if not user_email.endswith('@cougarnet.uh.edu'):
+            return "Access denied: Only CougarNet IDs are allowed.", 403
+
         session['user'] = {
             'name': user_info.get('displayName').lower(),
-            'email': user_info.get('userPrincipalName').lower(),
+            'email': user_email,
         }
         url = f"http://localhost:{app_config.PORT}/add_user"
         data = session['user']
-        res = requests.post(url,json=data)
+        res = requests.post(url, json=data)
         return redirect(url_for('index'))
-    
+
     return "Error: Unable to retrieve token", 400
 
 # Home Page
@@ -258,8 +302,9 @@ def index():
     user = session.get("user") 
     userinfo = None
     if user:
-        userinfo = get_user_by_email(user['email'])
+        userinfo = get_user_by_cougarid(user.get("cougarid"))
     forms = getTable("forms")
+    
     return render_template("index.html", user=userinfo,forms = forms)
 
 # Logout
@@ -284,6 +329,15 @@ def admin_dash():
                 
                 formDetails["approver_signature"] = base64.b64encode(formDetails["approver_signature"]).decode('utf-8')
     return render_template("admin.html",users=users,forms=forms,currUser=currUser)
+
+@app.route("/reports")
+def reports():
+    user = session.get("user")
+    if not user:
+        return "Forbidden", 403
+    currUser = getUserInfo(user['email'])
+
+    return render_template("reports.html", currUser=currUser)
 
 @app.route("/reactivate", methods=["POST"])
 def reactivate_account():
@@ -535,20 +589,6 @@ def submit_early_withdrawal_js():
     return jsonify({"message": "Early withdrawal form saved successfully!"})
 
 
-    # Save to database
-    add_or_update_form(
-        email=user["email"],
-        form_name=form_name,
-        form_content=form_content,
-        status="pending",
-        user_signature=signature_binary,
-        approver_signature=None,
-        approver_comment=""
-    )
-
-    return jsonify({"message": "Form saved successfully!"})
-
-
 @app.route("/show_pdf", methods=["POST"])
 def show_pdf():
     data = request.get_json()
@@ -614,4 +654,4 @@ if __name__ == "__main__":
     # Run the app
     app.run(host='0.0.0.0', port=app_config.PORT, use_reloader=False)
 
-    
+
