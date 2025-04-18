@@ -338,8 +338,16 @@ def reports():
     if not user:
         return "Forbidden", 403
     currUser = getUserInfo(user['email'])
-
-    return render_template("reports.html", currUser=currUser)
+    if (currUser.get('role').lower() != "admin"):
+        return "Forbidden", 403
+    users = getTable("users")
+    forms = getTable("forms")
+    if (forms):
+        for formId,formDetails in forms.items():
+            if formDetails.get("approver_signature"):
+                
+                formDetails["approver_signature"] = base64.b64encode(formDetails["approver_signature"]).decode('utf-8')
+    return render_template("reports.html",users=users,forms=forms,currUser=currUser)
 
 @app.route("/reactivate", methods=["POST"])
 def reactivate_account():
@@ -558,6 +566,21 @@ def submit_public_info_js():
     except Exception:
         return jsonify({"error": "Invalid signature format"}), 400
     
+      # Save to database
+    add_or_update_form(
+        email=user["email"],
+        form_name=form_name,
+        form_content=form_content,
+        status="pending",
+        user_signature=signature_binary,
+        approver_signature=None,
+        approver_comment=""
+    )
+ 
+    return jsonify({"message": "Form saved successfully!"})
+    
+    
+    
     
 @app.route("/submit-early-withdrawal-js", methods=["POST"])
 def submit_early_withdrawal_js():
@@ -589,6 +612,8 @@ def submit_early_withdrawal_js():
     )
 
     return jsonify({"message": "Early withdrawal form saved successfully!"})
+
+
 
 
 @app.route("/show_pdf", methods=["POST"])
