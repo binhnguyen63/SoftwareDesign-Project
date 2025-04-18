@@ -20,72 +20,11 @@
         <a href="{{ url_for('reports') }}">Reports Outlet</a>
         <a href="{{ url_for('approval_page') }}">Approval Page</a>
         {%endif%}
-
-        
-
       </div>
       <span>Welcome, {{ currUser.name }}</span>
       <a href="{{ url_for('logout') }}" class="btn">Logout</a>
     </nav>
     </div>
-
-
-
-    <div class="container">
-        <h1>Admin Dashboard</h1>
-      <div>
-        <h2>Users Information: </h2>
-        <div class="action-buttons">
-          <button class="alterbtn" id="create-btn" onclick="addRow()">Create User</button>
-          <button class="alterbtn" id="confirm-create-btn" onclick="confirmAddRow()">Confirm Create</button>
-          <button class="alterbtn" id="update" onclick="enableEditing()">Update User Information</button>
-          <button class="alterbtn" id="confirm-update" onclick="confirmUpdate()">Confirm Update</button>
-        </div>
-        <table id="userTable" class="table">
-          <tr>
-            <th>Email</th>
-            <th>Name</th>
-            <th>ID</th>
-            <th>Role</th>
-            <th>Account Status</th>
-            <th>Action</th>
-          </tr>
-          {% for userEmail,userInfo in users.items() %}
-          <tr>
-            <td contenteditable="false">{{ userEmail }}</td>
-            <td contenteditable="false">{{ userInfo.get("name") }}</td>
-            <td contenteditable="false">{{ userInfo.get("cougarid") }}</td>
-            <td>
-              <select disabled>
-                <option value="admin" {% if userInfo.get("role") == 'admin' %}selected{% endif %}>Admin</option>
-                <option value="undergraduate-student" {% if userInfo.get("role") == 'undergraduate-student' %}selected{% endif %}>Undergraduate Student</option>
-                <option value="graduate-student" {% if userInfo.get("role") == 'graduate-student' %}selected{% endif %}>Graduate Student</option>
-                <option value="dean" {% if userInfo.get("role") == 'dean' %}selected{% endif %}>dean</option>
-                <option value="department-head" {% if userInfo.get("role") == 'department-head' %}selected{% endif %}>department head</option>
-                <option value="grad-department-head" {% if userInfo.get("role") == 'grad-department' %}selected{% endif %}>Graduate department head</option>
-                <option value="undergrad-department-head" {% if userInfo.get("role") == 'undergrad-department-head' %}selected{% endif %}>Undergraduate department head</option>
-                <option value="secondary-department-head" {% if userInfo.get("role") == 'secondary-department-head' %}selected{% endif %}>Secondary department head</option>
-                <option value="grad-approver" {% if userInfo.get("role") == 'grad-approver' %}selected{% endif %}>Graduate Approver</option>
-                <option value="undergrad-approver" {% if userInfo.get("role") == 'undergrad-approver' %}selected{% endif %}>Undergraduate Approver</option>
-                <option value="public-info-form-approver" {% if userInfo.get("role") == 'public-info-form-approver' %}selected{% endif %}>Public Info Form Approver</option>
-                <option value="early-withdrawal-approver" {% if userInfo.get("role") == 'early-withdrawal-approver' %}selected{% endif %}>Early Withdrawal Form Approver</option>
-              </select>
-            </td>
-            <td>
-                <select disabled>
-                    <option value="True" {% if userInfo.get("account_status")%}selected{%endif%}>Active</option>
-                    <option value="False" {% if not userInfo.get("account_status")%}selected{%endif%}>Deactivated</option>
-                </select>
-            </td>
-            <td>
-                {%if userInfo.get("role").lower() != 'admin'%}
-                <button class = "alterbtn btn-primary" onclick="deleteRow(this, '{{userEmail}}')">Delete</button>
-                {%endif%}
-            </td>
-          </tr>
-          {% endfor %}
-        </table>
-      </div>
   
       <div>
         <h2>User's Submitted Forms: </h2>
