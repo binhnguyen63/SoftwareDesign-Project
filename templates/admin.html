@@ -51,8 +51,17 @@
             <td>
               <select disabled>
                 <option value="admin" {% if userInfo.get("role") == 'admin' %}selected{% endif %}>Admin</option>
-                <option value="undergraduate-student" {% if userInfo.get("role") == 'undergraduate-student' %}selected{% endif %}>undergraduate-student</option>
-                <option value="graduate-student" {% if userInfo.get("role") == 'graduate-student' %}selected{% endif %}>graduate-student</option>
+                <option value="undergraduate-student" {% if userInfo.get("role") == 'undergraduate-student' %}selected{% endif %}>Undergraduate Student</option>
+                <option value="graduate-student" {% if userInfo.get("role") == 'graduate-student' %}selected{% endif %}>Graduate Student</option>
+                <option value="dean" {% if userInfo.get("role") == 'dean' %}selected{% endif %}>dean</option>
+                <option value="department-head" {% if userInfo.get("role") == 'department-head' %}selected{% endif %}>department head</option>
+                <option value="grad-department-head" {% if userInfo.get("role") == 'grad-department' %}selected{% endif %}>Graduate department head</option>
+                <option value="undergrad-department-head" {% if userInfo.get("role") == 'undergrad-department-head' %}selected{% endif %}>Undergraduate department head</option>
+                <option value="secondary-department-head" {% if userInfo.get("role") == 'secondary-department-head' %}selected{% endif %}>Secondary department head</option>
+                <option value="grad-approver" {% if userInfo.get("role") == 'grad-approver' %}selected{% endif %}>Graduate Approver</option>
+                <option value="undergrad-approver" {% if userInfo.get("role") == 'undergrad-approver' %}selected{% endif %}>Undergraduate Approver</option>
+                <option value="public-info-form-approver" {% if userInfo.get("role") == 'public-info-form-approver' %}selected{% endif %}>Public Info Form Approver</option>
+                <option value="early-withdrawal-approver" {% if userInfo.get("role") == 'early-withdrawal-approver' %}selected{% endif %}>Early Withdrawal Form Approver</option>
               </select>
             </td>
             <td>
