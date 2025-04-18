@@ -1,0 +1,25 @@
+{% macro render_form_row(formDetails) %}
+<tr>
+  <td>{{ formDetails["form_id"] }}</td>
+  <td onclick="viewForm('{{ formDetails.form_id }}','{{ formDetails.email }}')" class="form-name">{{ formDetails["form_name"] }}</td>
+  <td>{{ formDetails["email"] }}</td>
+  <td>{{ formDetails["status"] }}
+    {% if formDetails.get("status") == "returned" %}
+      <span> - reason: {{ formDetails.get("approver_comment") }} </span>
+    {% endif %}
+  </td>
+  <td>
+    {% if formDetails["status"] != "approved" and formDetails["status"] != "denied" %}
+      <button class="alterbtn btn-primary" onclick="openApprovalModal('{{ formDetails.form_id }}',true)">Approve</button>
+      <button class="alterbtn btn-primary" onclick="openApprovalModal('{{ formDetails.form_id }}',false)">Deny</button>
+      <button class="request-info-btn alterbtn btn-primary" id="{{ formDetails.form_id }}">Request more Info</button>
+    {% endif %}
+  </td>
+  <td>
+    <img src="data:image/png;base64,{{ formDetails.approver_signature }}" width="50">
+  </td>
+  <td>
+    <button class="alterbtn btn-danger" onclick="deleteForm('{{ formDetails.form_id }}')">Delete</button>
+  </td>
+</tr>
+{% endmacro %}

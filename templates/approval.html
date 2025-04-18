@@ -38,34 +38,25 @@
             <th>Admin Approval Signature </th>
             <th>Delete Form </th>
           </tr>
-          {%for formId,formDetails in forms.items()%}
-          <tr>
-            <td>{{formDetails["form_id"]}}</td>
-            <td onclick="viewForm('{{formDetails.form_id}}','{{formDetails.email}}')" class="form-name">{{formDetails["form_name"]}}</td>
-            <td>{{formDetails["email"]}}</td>
-            <td>{{formDetails["status"]}}
-              {%if formDetails.get("status") == "returned"%}
-              <span> - reason: {{formDetails.get("approver_comment")}} </span>
-              {%endif%}
-            </td>
-            <td>
-              {%if formDetails["status"] != "approved" and formDetails["status"] != "denied" %}
-              <button class="alterbtn btn-primary" onclick="openApprovalModal('{{ formDetails.form_id }}',true)">Approve</button>
-              <button class="alterbtn btn-primary" onclick="openApprovalModal('{{ formDetails.form_id }}',false)">Deny</button>
-              <button class="request-info-btn alterbtn btn-primary" id="{{ formDetails.form_id }}">Request more Info</button>
-              {% endif %}
-  
-  
-            </td>
-            <td>
-              <img src="data:image/png;base64,{{formDetails.approver_signature}}" width="50">
-            </td>
+          {% from "macros.html" import render_form_row %}
 
-            <td>
-              <button class="alterbtn btn-danger" onclick="deleteForm('{{ formDetails.form_id }}')">Delete</button>
-            </td>
-          </tr>
-          {%endfor%}
+          {% for formId, formDetails in forms.items() %}
+            {% if currUser.role == "admin" or currUser.role == "dean" %}
+              {{ render_form_row(formDetails) }}
+            {% elif currUser.role == "department-head" and formDetails["form_name"] in ["graduate student petition form", "undergraduate transfer form"] %}
+              {{ render_form_row(formDetails) }}
+            {% elif currUser.role == "secondary-department-head" and formDetails["form_name"] in ["public info form", "early withdrawal form"] %}
+              {{ render_form_row(formDetails) }}
+            {% elif currUser.role == "grad-approver" and formDetails["form_name"] == "graduate student petition form" %}
+              {{ render_form_row(formDetails) }}
+            {% elif currUser.role == "undergrad-approver" and formDetails["form_name"] == "undergraduate transfer form" %}
+              {{ render_form_row(formDetails) }}
+            {% elif currUser.role == "public-info-form-approver" and formDetails["form_name"] == "public info form" %}
+              {{ render_form_row(formDetails) }}
+            {% elif currUser.role == "early-withdrawal-approver" and formDetails["form_name"] == "early withdrawal form" %}
+              {{ render_form_row(formDetails) }}
+            {% endif %}
+          {% endfor %}
         </table>
         
       </div>
@@ -107,3 +98,4 @@
 
   </body>
 </html>
+``` 
