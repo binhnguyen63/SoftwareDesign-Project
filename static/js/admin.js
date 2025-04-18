@@ -105,7 +105,7 @@ function enableEditing() {
   let table = document.getElementById("userTable");
   for (let i = 1; i < table.rows.length; i++) {
     if (
-      table.rows[i].cells[2].querySelector("select").value.toLowerCase() ===
+      table.rows[i].cells[3].querySelector("select").value.toLowerCase() ===
       "admin"
     )
       continue;
@@ -126,9 +126,10 @@ function confirmUpdate() {
     if (table.rows[i].cells[1].contentEditable === "true") {
       let email = table.rows[i].cells[0].innerText.trim();
       let name = table.rows[i].cells[1].innerText.trim();
-      let role = table.rows[i].cells[2].querySelector("select").value;
-      let account_status = table.rows[i].cells[3].querySelector("select").value;
-      updatedUsers.push({ email, name, role, account_status });
+      let cougarid = table.rows[i].cells[2].innerText.trim();
+      let role = table.rows[i].cells[3].querySelector("select").value;
+      let account_status = table.rows[i].cells[4].querySelector("select").value;
+      updatedUsers.push({ email, name, cougarid, role, account_status });
 
       for (let j = 0; j < 4; j++) {
         table.rows[i].cells[j].contentEditable = "false";

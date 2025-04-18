@@ -17,6 +17,7 @@
         <a href="{{ url_for('index') }}" class="logo">Home</a>
         {%if currUser.role == "admin"%}
         <a href="{{ url_for('admin_dash') }}">Admin Dashboard</a>
+        <a href="{{ url_for('reports') }}">Reports Outlet</a>
         {%endif%}
       </div>
       <span>Welcome, {{ currUser.name }}</span>
@@ -40,6 +41,7 @@
           <tr>
             <th>Email</th>
             <th>Name</th>
+            <th>ID</th>
             <th>Role</th>
             <th>Account Status</th>
             <th>Action</th>
@@ -48,11 +50,13 @@
           <tr>
             <td contenteditable="false">{{ userEmail }}</td>
             <td contenteditable="false">{{ userInfo.get("name") }}</td>
+            <td contenteditable="false">{{ userInfo.get("cougarid") }}</td>
             <td>
               <select disabled>
                 <option value="admin" {% if userInfo.get("role") == 'admin' %}selected{% endif %}>Admin</option>
                 <option value="undergraduate-student" {% if userInfo.get("role") == 'undergraduate-student' %}selected{% endif %}>undergraduate-student</option>
                 <option value="graduate-student" {% if userInfo.get("role") == 'graduate-student' %}selected{% endif %}>graduate-student</option>
+                <option value="delegate" {% if userInfo.get("role") == 'delegate' %}selected{% endif %}>delegate</option>
               </select>
             </td>
             <td>

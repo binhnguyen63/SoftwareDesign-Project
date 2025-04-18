@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Reports</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/admin.css') }}"
+    />
+    <script src="{{ url_for('static', filename='js/admin.js')}}" defer></script>
+  </head>
+  <body>
+    <div>
+      <nav>
+        <div>
+          <a href="{{ url_for('index') }}" class="logo">Home</a>
+          {% if currUser.role == "admin" %}
+          <a href="{{ url_for('admin_dash') }}">Admin Dashboard</a>
+          <a href="{{ url_for('reports') }}">Reports Outlet</a>
+          {% endif %}
+        </div>
+        <span>Welcome, {{ currUser.name }}</span>
+        <a href="{{ url_for('logout') }}" class="btn">Logout</a>
+      </nav>
+    </div>
+
+    <div class="container">
+      <h1>Reports Dashboard</h1>
+      <p>View approval statuses, pending approvals, and historical data.</p>
+
+      <section id="approval-statuses">
+        <h2>Approval Statuses</h2>
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Form Id</th>
+              <th>Form Name</th>
+              <th>Submitted By</th>
+              <th>Status</th>
+              <th>Approval Signature</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for formId, formDetails in forms.items() %} {% if formDetails["status"] !=
+            "pending" %}
+            <tr>
+              <td>{{ formDetails["form_id"] }}</td>
+              <td
+                onclick="viewForm('{{ formDetails.form_id }}','{{ formDetails.email }}')"
+                class="form-name"
+              >
+                {{ formDetails["form_name"] }}
+              </td>
+              <td>{{ formDetails["email"] }}</td>
+              <td>
+                {{formDetails["status"]}} {%if formDetails.get("status") ==
+                "returned"%}
+                <span> - reason: {{formDetails.get("approver_comment")}} </span>
+                {%endif%}
+              </td>
+              <td>
+                <img
+                  src="data:image/png;base64,{{ formDetails.approver_signature }}"
+                  width="50"
+                />
+              </td>
+            </tr>
+            {% endif %} {% endfor %}
+          </tbody>
+        </table>
+      </section>
+
+      <section id="pending-approvals">
+        <h2>Pending User Forms:</h2>
+        <table id="submitted-forms" class="table">
+          <thead>
+            <tr>
+              <th>Form Id</th>
+              <th>Form</th>
+              <th>Submitted By</th>
+              <th>Approval Signature</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for formId, formDetails in forms.items() %} {% if
+            formDetails["status"] == "pending" %}
+            <tr>
+              <td>{{ formDetails["form_id"] }}</td>
+              <td
+                onclick="viewForm('{{ formDetails.form_id }}','{{ formDetails.email }}')"
+                class="form-name"
+              >
+                {{ formDetails["form_name"] }}
+              </td>
+              <td>{{ formDetails["email"] }}</td>
+              <td>
+                <img
+                  src="data:image/png;base64,{{ formDetails.approver_signature }}"
+                  width="50"
+                />
+              </td>
+            </tr>
+            {% endif %} {% endfor %}
+          </tbody>
+        </table>
+      </section>
+
+      <section id="historical-data">
+        <h2>Historical Approval Data</h2>
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Form Id</th>
+              <th>Form Name</th>
+              <th>Submitted By</th>
+              <th>Status</th>
+              <th>Unit</th>
+              <th>Approval Signature</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for formId, formDetails in forms.items() %}
+            <tr>
+              <td>{{ formDetails["form_id"] }}</td>
+              <td
+                onclick="viewForm('{{ formDetails.form_id }}','{{ formDetails.email }}')"
+                class="form-name"
+              >
+                {{ formDetails["form_name"] }}
+              </td>
+              <td>{{ formDetails["email"] }}</td>
+              <td>
+                {{ formDetails["status"] }}
+                {% if formDetails.get("status") == "returned" %}
+                <span> - reason: {{ formDetails.get("approver_comment") }}</span>
+                {% endif %}
+              </td>
+              <td>
+                <img
+                  src="data:image/png;base64,{{ formDetails.approver_signature }}"
+                  width="50"
+                />
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </section>
+      
+    </div>
+  </body>
+</html>
