@@ -36,25 +36,26 @@
             <th>Status</th>
             <th>Action</th>
             <th>Admin Approval Signature </th>
+            <th>Delegate To</th>
             <th>Delete Form </th>
           </tr>
           {% from "macros.html" import render_form_row %}
 
           {% for formId, formDetails in forms.items() %}
             {% if currUser.role == "admin" or currUser.role == "dean" %}
-              {{ render_form_row(formDetails) }}
+              {{ render_form_row(formDetails, users, currUser) }}
             {% elif currUser.role == "department-head" and formDetails["form_name"] in ["graduate student petition form", "undergraduate transfer form"] %}
-              {{ render_form_row(formDetails) }}
+              {{ render_form_row(formDetails, users, currUser) }}
             {% elif currUser.role == "secondary-department-head" and formDetails["form_name"] in ["public info form", "early withdrawal form"] %}
-              {{ render_form_row(formDetails) }}
+              {{ render_form_row(formDetails, users, currUser) }}
             {% elif currUser.role == "grad-approver" and formDetails["form_name"] == "graduate student petition form" %}
-              {{ render_form_row(formDetails) }}
+              {{ render_form_row(formDetails, users, currUser) }}
             {% elif currUser.role == "undergrad-approver" and formDetails["form_name"] == "undergraduate transfer form" %}
-              {{ render_form_row(formDetails) }}
+              {{ render_form_row(formDetails, users, currUser) }}
             {% elif currUser.role == "public-info-form-approver" and formDetails["form_name"] == "public info form" %}
-              {{ render_form_row(formDetails) }}
+              {{ render_form_row(formDetails, users, currUser) }}
             {% elif currUser.role == "early-withdrawal-approver" and formDetails["form_name"] == "early withdrawal form" %}
-              {{ render_form_row(formDetails) }}
+              {{ render_form_row(formDetails, users, currUser) }}
             {% endif %}
           {% endfor %}
         </table>
@@ -98,4 +99,3 @@
 
   </body>
 </html>
-``` 

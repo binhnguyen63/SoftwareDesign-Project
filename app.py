@@ -361,7 +361,8 @@ def approval_page():
     if not currUser or currUser.get('role').lower() == "Undergradua`te Student || Graduate Student":
         return "Forbidden", 403
 
-    # Fetch all submitted forms
+    # Fetch all submitted forms and Users
+    users = getTable("users")
     forms = getTable("forms")
     if forms:
         for formId, formDetails in forms.items():
@@ -370,7 +371,7 @@ def approval_page():
                 formDetails["approver_signature"] = base64.b64encode(formDetails["approver_signature"]).decode('utf-8')
 
     # Render the approval.html template with the forms and current user
-    return render_template("approval.html", forms=forms, currUser=currUser)
+    return render_template("approval.html", users=users, forms=forms, currUser=currUser)
 
 @app.route("/reactivate", methods=["POST"])
 def reactivate_account():
