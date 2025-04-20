@@ -46,7 +46,6 @@ VALUES
     (LOWER('jane.smith@CougarNet.UH.EDU'), 'Jane Smith', 'undergraduate-student', FALSE, 3214567),
     (LOWER('alice.johnson@CougarNet.UH.EDU'), 'Alice Johnson', 'graduate-student', TRUE, 9803461),
     (LOWER('bob.williams@CougarNet.UH.EDU'), 'Bob Williams', 'graduate-student', FALSE, 4321543),
-    (LOWER('test.bruh@CougarNet.UH.EDU'), 'Bruh New', 'department-head', TRUE, 1235609),
     (LOWER('alex.manuel@CougarNet.UH.EDU'), 'Alex Manuel', 'undergraduate-student', FALSE, 4205412),
     (LOWER('ooyede@CougarNet.UH.EDU'), 'Ore Oyede', 'admin', TRUE, 2173037),
     (LOWER('stew.griffin@CougarNet.UH.EDU'), 'Stewie Griffin', 'early-withdrawal-approver', TRUE, 4182026)
