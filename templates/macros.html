@@ -1,0 +1,67 @@
+{% macro render_form_row(formDetails, users, currUser) %}
+<tr>
+  <td>{{ formDetails["form_id"] }}</td>
+  <td onclick="viewForm('{{ formDetails.form_id }}','{{ formDetails.email }}')" class="form-name">{{ formDetails["form_name"] }}</td>
+  <td>{{ formDetails["email"] }}</td>
+  <td>{{ formDetails["status"] }}
+    {% if formDetails.get("status") == "returned" %}
+      <span> - reason: {{ formDetails.get("approver_comment") }} </span>
+    {% endif %}
+  </td>
+  <td>
+    {% if formDetails["status"] != "approved" and formDetails["status"] != "denied" %}
+      <button class="alterbtn btn-primary" onclick="openApprovalModal('{{ formDetails.form_id }}',true)">Approve</button>
+      <button class="alterbtn btn-primary" onclick="openApprovalModal('{{ formDetails.form_id }}',false)">Deny</button>
+      <button class="request-info-btn alterbtn btn-primary" id="{{ formDetails.form_id }}">Request more Info</button>
+    {% endif %}
+  </td>
+  <td>
+    <img src="data:image/png;base64,{{ formDetails.approver_signature }}" width="50">
+  </td>
+  <td>
+    <!-- Delegate To Dropdown -->
+    {# Determine which roles the current user can delegate to #}
+    {% set allowed_roles = [] %}
+    {% if currUser.role == 'department-head' %}
+      {% set allowed_roles = ['grad-approver','undergrad-approver','department-head','dean'] %}
+    {% elif currUser.role == 'secondary-department-head' %}
+      {% set allowed_roles = ['public-info-form-approver','early-withdrawal-approver','secondary-department-head','dean'] %}
+      
+    {% elif currUser.role == 'admin' %}
+      {% set allowed_roles = ['grad-approver','undergrad-approver','department-head', 'secondary-department-head','dean','public-info-form-approver','early-withdrawal-approver'] %}
+    {% elif currUser.role == 'dean' %}
+      {% set allowed_roles = ['grad-approver','undergrad-approver','department-head', 'secondary-department-head','dean','public-info-form-approver','early-withdrawal-approver'] %}
+
+
+    {% elif currUser.role == 'grad-approver' %}
+      {% set allowed_roles = ['grad-approver','department-head'] %}
+    {% elif currUser.role == 'undergrad-approver' %}
+      {% set allowed_roles = ['undergrad-approver','department-head'] %}
+    {% elif currUser.role == 'public-info-form-approver' %}
+      {% set allowed_roles = ['public-info-form-approver','secondary-department-head'] %}
+    {% elif currUser.role == 'early-withdrawal-approver' %}
+      {% set allowed_roles = ['early-withdrawal-approver','secondary-department-head'] %}
+
+
+    {% else %}
+      {# fallback: everyone except students #}
+      {% set allowed_roles = users.values() | map(attribute='role') | reject('in', ['undergraduate-student','graduate-student']) | list %}
+    {% endif %}
+
+    <select class="delegate-dropdown">
+      <option value="" disabled selected>Select User</option>
+      {% for userEmail, userInfo in users.items() %}
+        {% if userInfo.get('role') in allowed_roles %}
+          <option value="{{ userEmail }}">
+            {{ userInfo.get('name') }} ({{ userEmail }})  Role:{{ userInfo.get('role') }}
+          </option>
+        {% endif %}
+      {% endfor %}
+    </select>
+    <button class="alterbtn btn-primary" onclick="delegateForm('{{ formDetails.form_id }}')">Delegate</button>
+  </td>
+  <td>
+    <button class="alterbtn btn-danger" onclick="deleteForm('{{ formDetails.form_id }}')">Delete</button>
+  </td>
+</tr>
+{% endmacro %}

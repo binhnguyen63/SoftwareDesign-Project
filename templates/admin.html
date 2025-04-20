@@ -18,7 +18,11 @@
         {%if currUser.role == "admin"%}
         <a href="{{ url_for('admin_dash') }}">Admin Dashboard</a>
         <a href="{{ url_for('reports') }}">Reports Outlet</a>
+        <a href="{{ url_for('approval_page') }}">Approval Page</a>
         {%endif%}
+
+        
+
       </div>
       <span>Welcome, {{ currUser.name }}</span>
       <a href="{{ url_for('logout') }}" class="btn">Logout</a>

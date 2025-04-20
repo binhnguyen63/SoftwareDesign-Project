@@ -349,6 +349,29 @@ def reports():
                 formDetails["approver_signature"] = base64.b64encode(formDetails["approver_signature"]).decode('utf-8')
     return render_template("reports.html",users=users,forms=forms,currUser=currUser)
 
+@app.route("/approval")
+def approval_page():
+    user = session.get("user")
+    if not user:
+        return "Forbidden", 403
+
+    # Get the current user's information
+    currUser = getUserInfo(user['email'])
+    if not currUser or currUser.get('role').lower() == "Undergradua`te Student || Graduate Student":
+        return "Forbidden", 403
+
+    # Fetch all submitted forms and Users
+    users = getTable("users")
+    forms = getTable("forms")
+    if forms:
+        for formId, formDetails in forms.items():
+            # Convert approver_signature to base64 for rendering in the template
+            if formDetails.get("approver_signature"):
+                formDetails["approver_signature"] = base64.b64encode(formDetails["approver_signature"]).decode('utf-8')
+
+    # Render the approval.html template with the forms and current user
+    return render_template("approval.html", users=users, forms=forms, currUser=currUser)
+
 @app.route("/reactivate", methods=["POST"])
 def reactivate_account():
     try:

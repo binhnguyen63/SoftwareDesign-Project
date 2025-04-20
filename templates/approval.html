@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/admin.css') }}"
+    />
+    <title>Administrator</title>
+    <script src="{{ url_for('static', filename='js/admin.js')}}" defer></script>
+  </head>
+  <body>
+    <div >
+    <nav>
+      <div>
+        <a href="{{ url_for('index') }}" class="logo">Home</a>
+        {%if currUser.role == "admin"%}
+        <a href="{{ url_for('admin_dash') }}">Admin Dashboard</a>
+        <a href="{{ url_for('reports') }}">Reports Outlet</a>
+        <a href="{{ url_for('approval_page') }}">Approval Page</a>
+        {%endif%}
+      </div>
+      <span>Welcome, {{ currUser.name }}</span>
+      <a href="{{ url_for('logout') }}" class="btn">Logout</a>
+    </nav>
+    </div>
+  
+      <div>
+        <h2>User's Submitted Forms: </h2>
+        <table id="submitted-forms">
+          <tr>
+            <th>Form Id</th>
+            <th>Form</th>
+            <th>Email</th>
+            <th>Status</th>
+            <th>Action</th>
+            <th>Admin Approval Signature </th>
+            <th>Delegate To</th>
+            <th>Delete Form </th>
+          </tr>
+          {% from "macros.html" import render_form_row %}
+
+          {% for formId, formDetails in forms.items() %}
+            {% if currUser.role == "admin" or currUser.role == "dean" %}
+              {{ render_form_row(formDetails, users, currUser) }}
+            {% elif currUser.role == "department-head" and formDetails["form_name"] in ["graduate student petition form", "undergraduate transfer form"] %}
+              {{ render_form_row(formDetails, users, currUser) }}
+            {% elif currUser.role == "secondary-department-head" and formDetails["form_name"] in ["public info form", "early withdrawal form"] %}
+              {{ render_form_row(formDetails, users, currUser) }}
+            {% elif currUser.role == "grad-approver" and formDetails["form_name"] == "graduate student petition form" %}
+              {{ render_form_row(formDetails, users, currUser) }}
+            {% elif currUser.role == "undergrad-approver" and formDetails["form_name"] == "undergraduate transfer form" %}
+              {{ render_form_row(formDetails, users, currUser) }}
+            {% elif currUser.role == "public-info-form-approver" and formDetails["form_name"] == "public info form" %}
+              {{ render_form_row(formDetails, users, currUser) }}
+            {% elif currUser.role == "early-withdrawal-approver" and formDetails["form_name"] == "early withdrawal form" %}
+              {{ render_form_row(formDetails, users, currUser) }}
+            {% endif %}
+          {% endfor %}
+        </table>
+        
+      </div>
+      <div id="request-info-modal" class="modal">
+        <div class="modal-content">
+          <span class="close" onclick="closeRequestInfoModal()">&times;</span>
+          <h2>Request More Information</h2>
+          <p>Please provide a reason for returning the form:</p>
+          <textarea id="request-info-reason" placeholder="Enter reason..." rows="4" cols="50"></textarea>
+          <button onclick="submitRequestInfo()">Submit Request</button>
+        </div>
+      </div>
+  
+      <div id="approval-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h2>Approve Form</h2>
+            <p>Upload your signature to approve the form.</p>
+    
+            <form id="approval-form">
+                <input type="file" id="approver-signature" accept="image/*" name="approver-signature" required>
+                <canvas id="approver-signature-canvas" width="300" height="150"></canvas>
+                <button type="submit">Submit Approval</button>
+            </form>
+        </div>
+
+    </div>
+    
+    <div id="delete-modal" class="modal">
+      <div class="modal-content">
+        <span class="close" onclick="closeDeleteModal()">&times;</span>
+        <h2>Delete Form</h2>
+        <p>Are you sure you want to permanently delete this form?</p>
+        <button class="alterbtn btn-danger" id="confirm-delete-btn">Yes, Delete</button>
+        <button class="alterbtn" onclick="closeDeleteModal()">Cancel</button>
+      </div>
+    </div>
+    </div>
+
+  </body>
+</html>
