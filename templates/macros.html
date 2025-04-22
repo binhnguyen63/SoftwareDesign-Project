@@ -48,17 +48,20 @@
       {% set allowed_roles = users.values() | map(attribute='role') | reject('in', ['undergraduate-student','graduate-student']) | list %}
     {% endif %}
 
-    <select class="delegate-dropdown">
+    <select id="delegate-user-{{ formDetails.form_id }}" class="delegate-dropdown">
       <option value="" disabled selected>Select User</option>
       {% for userEmail, userInfo in users.items() %}
         {% if userInfo.get('role') in allowed_roles %}
           <option value="{{ userEmail }}">
-            {{ userInfo.get('name') }} ({{ userEmail }})  Role:{{ userInfo.get('role') }}
+            {{ userInfo.get('name') }} ({{ userEmail }}) Role: {{ userInfo.get('role') }}
           </option>
         {% endif %}
       {% endfor %}
     </select>
-    <button class="alterbtn btn-primary" onclick="delegateForm('{{ formDetails.form_id }}')">Delegate</button>
+    <button class="alterbtn btn-primary"
+      onclick="delegateForm('{{ formDetails.form_id }}')">
+    Delegate
+    </button>
   </td>
   <td>
     <button class="alterbtn btn-danger" onclick="deleteForm('{{ formDetails.form_id }}')">Delete</button>

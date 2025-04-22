@@ -349,6 +349,40 @@ async function submitRequestInfo() {
 }
 
 
+async function delegateForm(formId) {
+  // Get the selected user from the dropdown
+  const dropdown = document.getElementById(`delegate-user-${formId}`);
+  const delegateTo = dropdown.value;
+
+  // Check if a user is selected
+  if (!delegateTo) {
+    return alert("Please select a user to delegate the form to.");
+  }
+
+  try {
+    // Send the formId and delegateTo to the backend
+    const response = await fetch("/delegate_form", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ form_id: formId, delegate_to: delegateTo }),
+    });
+
+    const result = await response.json();
+
+    if (response.ok && result.success) {
+      alert("Form successfully delegated!");
+      location.reload(); // Reload the page to reflect changes
+    } else {
+      throw new Error(result.error || "Failed to delegate the form.");
+    }
+  } catch (error) {
+    console.error("Error delegating form:", error);
+    alert("An error occurred while delegating the form: " + error.message);
+  }
+}
+
+
+
 
 let formIdToDelete = null;
 

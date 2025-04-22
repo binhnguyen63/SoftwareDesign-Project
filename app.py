@@ -368,9 +368,10 @@ def approval_page():
     query = """
     SELECT u.email AS user_email, u.name AS user_name, f.form_id, f.form_name, f.status
     FROM users u
-    JOIN forms f ON u.form_id = f.form_id;
+    JOIN forms f ON u.form_id = f.form_id
+    WHERE u.email = %s;
     """
-    g.db_cursor.execute(query)
+    g.db_cursor.execute(query, (currUser['email'],))
     delegated_forms = g.db_cursor.fetchall()
 
     if forms:
@@ -381,6 +382,30 @@ def approval_page():
 
     # Render the approval.html template with the forms and current user
     return render_template("approval.html", users=users, forms=forms, currUser=currUser, delegated_forms = delegated_forms)
+
+
+@app.route("/delegate_form", methods=["POST"])
+def delegate_form():
+    data = request.get_json() or {}
+    form_id = data.get("form_id")
+    delegate_to = data.get("delegate_to")   # this is the user’s email
+
+    if not form_id or not delegate_to:
+        return jsonify(success=False, error="Missing form_id or delegate_to"), 400
+
+    update_sql = """
+      UPDATE users
+         SET form_id = %s
+       WHERE email   = %s
+    """
+    try:
+        g.db_cursor.execute(update_sql, (form_id, delegate_to))
+        g.db_conn.commit()
+    except Exception as e:
+        g.db_conn.rollback()
+        return jsonify(success=False, error=str(e)), 500
+
+    return jsonify(success=True)
 
 @app.route("/reactivate", methods=["POST"])
 def reactivate_account():
