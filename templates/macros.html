@@ -48,20 +48,35 @@
       {% set allowed_roles = users.values() | map(attribute='role') | reject('in', ['undergraduate-student','graduate-student']) | list %}
     {% endif %}
 
-    <select id="delegate-user-{{ formDetails.form_id }}" class="delegate-dropdown">
-      <option value="" disabled selected>Select User</option>
-      {% for userEmail, userInfo in users.items() %}
-        {% if userInfo.get('role') in allowed_roles %}
-          <option value="{{ userEmail }}">
-            {{ userInfo.get('name') }} ({{ userEmail }}) Role: {{ userInfo.get('role') }}
-          </option>
-        {% endif %}
-      {% endfor %}
-    </select>
-    <button class="alterbtn btn-primary"
-      onclick="delegateForm('{{ formDetails.form_id }}')">
-    Delegate
-    </button>
+
+    {% set ns = namespace(delegated=None) %}
+    {% for u_email, u_info in users.items() %}
+      {% if u_info.get('form_id') == formDetails.form_id %}
+        {% set ns.delegated = u_info %}
+      {% endif %}
+    {% endfor %}
+
+    {% if ns.delegated %}
+      <em>This form is already delegated to {{ ns.delegated.get('name') }}</em>
+    {% else %}
+      <select 
+        id="delegate-user-{{ formDetails.form_id }}" 
+        class="delegate-dropdown">
+        <option value="" disabled selected>Select User</option>
+        {% for userEmail, userInfo in users.items() %}
+          {% if userInfo.get('role') in allowed_roles %}
+            <option value="{{ userEmail }}">
+              {{ userInfo.get('name') }} ({{ userEmail }}) Role: {{ userInfo.get('role') }}
+            </option>
+          {% endif %}
+        {% endfor %}
+      </select>
+      <button 
+        class="alterbtn btn-primary" 
+        onclick="delegateForm('{{ formDetails.form_id }}')">
+        Delegate
+      </button>
+    {% endif %}
   </td>
   <td>
     <button class="alterbtn btn-danger" onclick="deleteForm('{{ formDetails.form_id }}')">Delete</button>
