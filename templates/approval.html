@@ -8,7 +8,18 @@
       href="{{ url_for('static', filename='css/admin.css') }}"
     />
     <title>Administrator</title>
-    <script src="{{ url_for('static', filename='js/admin.js')}}" defer></script>
+    <!-- load your external JS first -->
+    <script src="{{ url_for('static', filename='js/admin.js') }}" defer></script>
+
+    <!-- then, in a separate script block, serialize the data and log it -->
+    <script defer>
+      // `|tojson` comes from Jinja2 to safely emit JS literals
+      //const delegatedForms = {{ delegated_forms | tojson }};
+      //console.log("Delegated Forms:", delegatedForms);
+    </script>
+
+    
+
   </head>
   <body>
     <div >
@@ -61,6 +72,50 @@
         </table>
         
       </div>
+
+
+       <!-- Your Delegated Forms -->
+        <div>
+          <h2>Your Delegated Forms:</h2>
+          <table id="delegated-forms">
+            <thead>
+              <tr>
+                <th>Form Id</th>
+                <th>Form</th>
+                <th>Email</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for form in delegated_forms %}
+                <tr>
+                  <td>{{ form[2] }}</td> <!-- form_id -->
+                  <td>
+                    <a onclick="viewForm('{{ form[2] }}', '{{ form[0] }}')" class="form-name">
+                      {{ form[3] }} <!-- form_name -->
+                    </a>
+                  </td>
+                  <td>{{ form[0] }}</td> <!-- user_email -->
+                  <td>{{ form[4] }}</td> <!-- status -->
+                  <td>
+                    {% if form[4] != "approved" and form[4] != "denied" %}
+                      <button class="alterbtn btn-primary" onclick="openApprovalModal('{{ form[2] }}', true)">Approve</button>
+                      <button class="alterbtn btn-primary" onclick="openApprovalModal('{{ form[2] }}', false)">Deny</button>
+                      <button class="request-info-btn alterbtn btn-primary" onclick="openRequestInfoModal('{{ form[2] }}')">Request More Info</button>
+                    {% endif %}
+                  </td>
+                </tr>
+              {% else %}
+                <tr>
+                  <td colspan="5">No delegated forms found.</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+
+        
       <div id="request-info-modal" class="modal">
         <div class="modal-content">
           <span class="close" onclick="closeRequestInfoModal()">&times;</span>
