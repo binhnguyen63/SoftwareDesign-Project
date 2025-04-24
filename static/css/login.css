@@ -1,50 +1,65 @@
 /* General Styles */
 body {
-    font-family: "Arial", sans-serif;
-    background-color: #f4f4f4;
-    margin: 0;
-    padding: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-  }
-  
-  /* Login Container */
-  .login-container {
-    width: 350px;
-    background-color: #ffffff;
-    border-radius: 8px;
-    padding: 30px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    text-align: center;
-  }
-  
-  /* Login Title */
-  .login-container h2 {
-    color: #cb142c;
-    margin-bottom: 20px;
-  }
-  
-  /* Login Button */
-  .login-container .btn {
-    background-color: #cb142c;
-    color: white;
-    padding: 10px 15px;
-    border-radius: 5px;
-    text-decoration: none;
-    font-weight: bold;
-    display: inline-block;
-    margin-top: 20px;
-    cursor: pointer;
-  }
-  
-  .login-container .btn:hover {
-    background-color: #a01024;
-  }
-  
-  /* Login Text */
-  .login-container p {
-    color: #160204;
-    margin-bottom: 20px;
-  }
+  font-family: "Arial", sans-serif;
+  background-color: #f4f4f4;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  text-align: center;
+}
+
+/* Title */
+h1 {
+  color: #cb142c;
+  margin-bottom: 30px;
+}
+
+/* Form Styles */
+form {
+  width: 350px;
+  background-color: #ffffff;
+  border-radius: 8px;
+  padding: 30px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Input Field */
+input[type="text"] {
+  width: 100%;
+  padding: 10px;
+  margin: 10px 0 20px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+/* Label */
+label {
+  display: block;
+  text-align: left;
+  margin-bottom: 5px;
+  color: #333;
+  font-weight: bold;
+}
+
+/* Button */
+button {
+  width: 100%;
+  background-color: #cb142c;
+  color: white;
+  padding: 12px;
+  border: none;
+  border-radius: 5px;
+  font-weight: bold;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s;
+}
+
+button:hover {
+  background-color: #a01024;
+}
